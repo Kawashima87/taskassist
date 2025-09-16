@@ -15,7 +15,10 @@ return new class extends Migration
     {
         Schema::create('favorites', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // お気に入りしたユーザー
+            $table->foreignId('post_id')->constrained()->onDelete('cascade'); // お気に入り対象の投稿
             $table->timestamps();
+            $table->unique(['user_id', 'post_id']); // 同じユーザーが同じ投稿を重複して保存できないように
         });
     }
 

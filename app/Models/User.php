@@ -48,6 +48,12 @@ class User extends Authenticatable
         return $this->hasMany(Favorite::class);
     }
 
+    // 自分が作成した投稿
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
+
     //お気に入り済みを一覧表示
     public function favoritePosts()
     {

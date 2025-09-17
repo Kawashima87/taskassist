@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
+use App\Models\Favorite
 
 class PostController extends Controller
 {
@@ -136,5 +137,21 @@ class PostController extends Controller
         $post = \App\Models\Post::findOrFail($id);
         $post->delete();
         return redirect()->route('posts.index')->with('success', 'タスクを削除しました');
+    }
+
+    // 自分がお気に入りした投稿一覧
+    public function favorites()
+    {
+        $user = auth()->user();
+        $posts = $user->favoritePosts()->with('user')->get(); // UserモデルにfavoritePostsを追加済みなのでOK
+        return view('posts.favorites', compact('posts'));
+    }
+
+    // 自分が作成した投稿一覧
+    public function myposts()
+    {
+        $user = auth()->user();
+        $posts = $user->posts()->with('favorites')->get(); // Postモデルにuser()があるので、Userモデルにもposts()が必要
+        return view('posts.myposts', compact('posts'));
     }
 }

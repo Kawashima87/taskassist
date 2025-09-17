@@ -1,8 +1,19 @@
 @foreach($posts as $post)
-    <form action="" method="POST" style="display:inline;">
-        @csrf
-        <button type="button">☆</button>
-    </form>
+
+    @if ($post->isFavoritedBy(auth()->user()))
+        {{-- お気に入り解除 --}}
+        <form action="{{ route('favorites.destroy', $post->id) }}" method="POST" style="display:inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" style="color: gold;">★</button>
+        </form>
+    @else
+        {{-- お気に入り登録 --}}
+        <form action="{{ route('favorites.store', $post->id) }}" method="POST" style="display:inline;">
+            @csrf
+            <button type="submit" style="color: gray;">☆</button>
+        </form>
+    @endif
 
     @if ($post->screenshot_path)
         <img src="{{ asset('storage/'.$post->screenshot_path) }}" alt="実行結果" style="width:150px; height:auto;">

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\FavoriteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,9 +16,9 @@ use App\Http\Controllers\PostController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('welcome');
+// });
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -31,8 +32,12 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::resource('posts', PostController::class); //posts 以下に index/create/store/show/edit/update/destroy 自動割り当て
+//!タイムスケジューラ
 
-Route::post('/create', [PostController::class, 'create'])->name('posts.create');//新規作成画面
-Route::post('/store', [PostController::class, 'store'])->name('posts.store');//新規データ作成
-Route::get('/index', [PostController::class, 'index'])->name('posts.index');//一覧表示
+Route::resource('posts', PostController::class); //posts 以下に index/create/store/show/edit/update/destroy 自動割り当て
+Route::get('/', [PostController::class, 'index'])->name('posts.index')->middleware('auth');//デフォルト画面
+Route::get('/favorites', [PostController::class, 'favorites'])->name('posts.favorites')->middleware('auth');// 自分のお気に入り一覧
+Route::get('/myposts', [PostController::class, 'myposts'])->name('posts.myposts')->middleware('auth');// 自分の投稿一覧
+
+Route::post('/posts/{post}/favorite', [FavoriteController::class, 'store'])->name('favorites.store')->middleware('auth');//お気に入り登録
+Route::delete('/posts/{post}/favorite', [FavoriteController::class, 'destroy'])->name('favorites.destroy')->middleware('auth');//お気に入り解除

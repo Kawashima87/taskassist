@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Post;
 
 class PostController extends Controller
 {
@@ -13,7 +14,8 @@ class PostController extends Controller
      */
     public function index()//!データの一覧表示 index
     {
-        //
+        $posts = Post::orderBy('created_at', 'desc')->get();
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -23,7 +25,7 @@ class PostController extends Controller
      */
     public function create()//!新規作成用フォームの表示 create
     {
-        //
+        return view('posts.create');
     }
 
     /**
@@ -34,7 +36,32 @@ class PostController extends Controller
      */
     public function store(Request $request)//!データの新規保存 store
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|unique:posts|max:255',
+            'body' => 'nullable',
+            'program_path' => 'required',
+            'arguments' => 'nullable',
+            'run_datetime' => 'required|date',
+            'screenshot' => 'nullable|image|max:2048',
+        ]);
+
+        $screenshotPath = null;
+        if ($request->hasFile('screenshot')) {
+            $screenshotPath = $request->file('screenshot')->store('screenshots', 'public');
+        }
+
+        Post::create([
+            'user_id' => auth()->id(),
+            'title' => $validated['title'],
+            'body' => $validated['body'] ?? null,
+            'program_path' => $validated['program_path'],
+            'arguments' => $validated['arguments'] ?? null,
+            'run_datetime' => $validated['run_datetime'],
+            'enabled' => true,
+            'screenshot_path' => $screenshotPath, // ← DBに保存される
+        ]);
+
+        return redirect()->route('posts.index')->with('success', 'タスクを登録しました');
     }
 
     /**

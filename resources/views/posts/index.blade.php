@@ -1,3 +1,9 @@
+{{-- 検索フォーム --}}
+<form action="{{ route('posts.index') }}" method="GET" style="margin-bottom: 20px;">
+    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="タイトルや説明で検索">
+    <button type="submit">検索</button>
+</form>
+
 @foreach($posts as $post)
 
     @if ($post->isFavoritedBy(auth()->user()))

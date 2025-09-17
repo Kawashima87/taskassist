@@ -36,8 +36,7 @@ require __DIR__.'/auth.php';
 
 Route::resource('posts', PostController::class); //posts 以下に index/create/store/show/edit/update/destroy 自動割り当て
 Route::get('/', [PostController::class, 'index'])->name('posts.index')->middleware('auth');//デフォルト画面
-Route::get('/favorites', [PostController::class, 'favorites'])->name('posts.favorites')->middleware('auth');// 自分のお気に入り一覧
-Route::get('/myposts', [PostController::class, 'myposts'])->name('posts.myposts')->middleware('auth');// 自分の投稿一覧
+Route::get('/mypage', [PostController::class, 'mypage'])->name('posts.mypage')->middleware('auth');
 
 Route::post('/posts/{post}/favorite', [FavoriteController::class, 'store'])->name('favorites.store')->middleware('auth');//お気に入り登録
 Route::delete('/posts/{post}/favorite', [FavoriteController::class, 'destroy'])->name('favorites.destroy')->middleware('auth');//お気に入り解除

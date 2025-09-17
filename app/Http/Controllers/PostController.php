@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Post;
-use App\Models\Favorite
+use App\Models\Favorite;
 
 class PostController extends Controller
 {
@@ -13,8 +13,13 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()//!データの一覧表示 index
+    public function index(Request $request)//!データの一覧表示 index
     {
+        $query = Post::query();
+        if ($search = $request->input('search')) {
+            $query->where('title', 'like', "%{$search}%")
+                ->orWhere('body', 'like', "%{$search}%");
+        }
         $posts = Post::orderBy('created_at', 'desc')->get();
         return view('posts.index', compact('posts'));
     }
@@ -139,19 +144,17 @@ class PostController extends Controller
         return redirect()->route('posts.index')->with('success', 'タスクを削除しました');
     }
 
-    // 自分がお気に入りした投稿一覧
-    public function favorites()
+    public function mypage(Request $request)
     {
+        $tab = $request->get('tab', 'history'); // デフォルトは history
         $user = auth()->user();
-        $posts = $user->favoritePosts()->with('user')->get(); // UserモデルにfavoritePostsを追加済みなのでOK
-        return view('posts.favorites', compact('posts'));
-    }
 
-    // 自分が作成した投稿一覧
-    public function myposts()
-    {
-        $user = auth()->user();
-        $posts = $user->posts()->with('favorites')->get(); // Postモデルにuser()があるので、Userモデルにもposts()が必要
-        return view('posts.myposts', compact('posts'));
+        if ($tab === 'like') {
+            $posts = $user->favoritePosts()->with('user')->get();
+        } else {
+            $posts = $user->posts()->with('favorites')->get();
+        }
+
+        return view('posts.mypage', compact('posts', 'tab'));
     }
 }

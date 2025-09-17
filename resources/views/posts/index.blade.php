@@ -1,6 +1,13 @@
 {{-- 検索フォーム --}}
 <form action="{{ route('posts.index') }}" method="GET" style="margin-bottom: 20px;">
+
     <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="タイトルや説明で検索">
+        <select name="sort">
+        <option value="">新しい順</option>
+        <option value="old" {{ $sort === 'old' ? 'selected' : '' }}>古い順</option>
+        <option value="favorites" {{ $sort === 'favorites' ? 'selected' : '' }}>人気順</option>
+    </select>
+
     <button type="submit">検索</button>
 </form>
 
@@ -20,6 +27,8 @@
             <button type="submit" style="color: gray;">☆</button>
         </form>
     @endif
+    <p>お気に入り数: {{ $post->favorites_count }}00</p>
+    <p>投稿者: {{ $post->user->name }}</p>
 
     @if ($post->screenshot_path)
         <img src="{{ asset('storage/'.$post->screenshot_path) }}" alt="実行結果" style="width:150px; height:auto;">
@@ -31,3 +40,8 @@
     <p>{{ $post->body }}</p>
     <a href="{{ route('posts.show', $post->id) }}">詳細を見る</a>
 @endforeach
+
+<div style="margin-top: 20px;">
+    {{ $posts->appends(['search' => $search ?? '', 'sort' => $sort ?? ''])->links() }}{{-- 条件を保持したままページング --}}
+</div>
+

@@ -13,6 +13,8 @@
         <button type="submit" style="color: gray;">☆ お気に入り</button>
     </form>
 @endif
+<p>投稿者: {{ $post->user->name }}</p>
+
 @if ($post->screenshot_path)
     <img src="{{ asset('storage/'.$post->screenshot_path) }}" 
             alt="スクショ" 
@@ -38,9 +40,14 @@
 </dl>
 
 <a href="{{ route('posts.index') }}">← 一覧に戻る</a>
-<a href="{{ route('posts.edit', $post->id) }}">編集</a>
-<form action="{{ route('posts.destroy', $post->id) }}" method="POST">
-    @csrf
-    @method('DELETE')
-    <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
-</form>
+@auth
+    @if ($post->user_id === auth()->id())
+        <a href="{{ route('posts.edit', $post->id) }}">編集</a>
+        <form action="{{ route('posts.destroy', $post->id) }}" method="POST">
+            @csrf
+            @method('DELETE')
+            <button type="submit" onclick="return confirm('本当に削除しますか？')">削除</button>
+        </form>
+    @endif
+@endauth
+

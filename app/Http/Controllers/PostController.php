@@ -15,13 +15,27 @@ class PostController extends Controller
      */
     public function index(Request $request)//!データの一覧表示 index
     {
-        $query = Post::query();
+        $query = Post::withCount('favorites'); // ← お気に入り数を一緒に取得
+        
         if ($search = $request->input('search')) {
-            $query->where('title', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
                 ->orWhere('body', 'like', "%{$search}%");
+            });
         }
-        $posts = Post::orderBy('created_at', 'desc')->get();
-        return view('posts.index', compact('posts'));
+
+        // 並び替え処理
+        $sort = $request->input('sort');
+        if ($sort === 'old') {
+            $query->orderBy('created_at', 'asc'); // 古い投稿順
+        } elseif ($sort === 'favorites') {
+            $query->orderBy('favorites_count', 'desc'); // 人気順
+        } else {
+            $query->orderBy('created_at', 'desc'); // デフォルト：新しい投稿順
+        }
+
+        $posts = $query->paginate(1);//ページネーション
+        return view('posts.index', compact('posts', 'search', 'sort'));
     }
 
     /**
@@ -78,7 +92,7 @@ class PostController extends Controller
      */
     public function show($id)//!データの個別表示 show
     {
-        $post = \App\Models\Post::findOrFail($id);
+        $post = Post::with('user')->findOrFail($id);
         return view('posts.show', compact('post'));
     }
 
@@ -150,9 +164,9 @@ class PostController extends Controller
         $user = auth()->user();
 
         if ($tab === 'like') {
-            $posts = $user->favoritePosts()->with('user')->get();
+            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(1);// お気に入り投稿
         } else {
-            $posts = $user->posts()->with('favorites')->get();
+            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(1);// 自分の投稿
         }
 
         return view('posts.mypage', compact('posts', 'tab'));

@@ -18,6 +18,9 @@ class Post extends Model
         'run_datetime',
         'enabled',
         'screenshot_path',
+        'action_type',
+        'popup_title',
+        'popup_message',
     ];
 
     //投稿者とのリレーション

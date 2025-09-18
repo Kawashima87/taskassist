@@ -60,10 +60,13 @@ class PostController extends Controller
     $validated = $request->validate([
         'title' => 'required|unique:posts|max:255',
         'body' => 'nullable',
-        'program_path' => 'required',
-        'arguments' => 'nullable',
         'run_datetime' => 'required|date',
         'screenshot' => 'nullable|image|max:2048',
+        'action_type' => 'required|in:program,popup',
+        'program_path' => 'nullable|required_if:action_type,program',
+        'arguments' => 'nullable',
+        'popup_title' => 'nullable|required_if:action_type,popup',
+        'popup_message' => 'nullable|required_if:action_type,popup',
     ]);
 
     $screenshotPath = null;
@@ -71,46 +74,82 @@ class PostController extends Controller
         $screenshotPath = $request->file('screenshot')->store('screenshots', 'public');
     }
 
-    // ★ まずDB保存
+    // ★ DB保存
     $post = Post::create([
         'user_id' => auth()->id(),
         'title' => $validated['title'],
         'body' => $validated['body'] ?? null,
-        'program_path' => $validated['program_path'],
-        'arguments' => $validated['arguments'] ?? null,
         'run_datetime' => $validated['run_datetime'],
+        'action_type' => $validated['action_type'],
+        'program_path' => $validated['program_path'] ?? null,
+        'arguments' => $validated['arguments'] ?? null,
+        'popup_title' => $validated['popup_title'] ?? null,
+        'popup_message' => $validated['popup_message'] ?? null,
         'enabled' => true,
         'screenshot_path' => $screenshotPath,
     ]);
 
-    // タスクスケジューラー登録
-    $title = $post->title;
-    $desc  = $post->body ?? '';
-    $program = $post->program_path;
-    $args = $post->arguments ?? '';
-    $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');//このフォーマットじゃないと「Y-MM-dd HH:mm」は繰り返してて重複するからダメ。
+    //★PowerShell ファイルを書き出す処理
+    $filename = 'popup_' . uniqid() . '.ps1';  // ファイル名（ユニーク化）
+    $filePath = storage_path('app/' . $filename);  // 保存先パス
+    $popupTitle   = $post->popup_title ?? '通知';
+    $popupMessage = $post->popup_message ?? '時間になりました！';
+    // PowerShell の中身
+    $script = "(New-Object -ComObject Wscript.Shell).Popup('$popupMessage',0,'$popupTitle',64)";
 
-    // PowerShell コマンド
-    $command = 'powershell -Command "'
-        . '$action = New-ScheduledTaskAction -Execute \'' . $program . '\' '
-        . ($args !== '' ? ' -Argument \'' . $args . '\'' : '') . '; '
-        . '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; '
-        . 'Register-ScheduledTask -TaskName \'' . $title . '\''
-        . ' -Description \'' . $desc . '\''
-        . ' -Action $action -Trigger $trigger -Force"';
+    // 
+    file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8'));
 
-    // 同期実行（まずは確実に登録できることを確認する）
+
+
+    
+    // ★ タスクスケジューラ登録
+    $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');
+
+    if ($post->action_type === 'program') {
+        // アプリ実行
+        $program = $post->program_path;
+        $args = $post->arguments ?? '';
+
+        $command = 'powershell -Command "'
+            . '$action = New-ScheduledTaskAction -Execute \'' . $program . '\' '
+            . ($args !== '' ? ' -Argument \'' . $args . '\'' : '') . '; '
+            . '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; '
+            . 'Register-ScheduledTask -TaskName \'' . $post->title . '\''
+            . ' -Description \'' . ($post->body ?? '') . '\''
+            . ' -Action $action -Trigger $trigger -Force"';
+
+    } elseif ($post->action_type === 'popup') {
+        // ★ PowerShell ファイルを書き出す処理
+        $filename = 'popup_' . uniqid() . '.ps1';  // ファイル名（ユニーク化）
+        $filePath = storage_path('app/' . $filename);  // 保存先パス
+        $popupTitle   = $post->popup_title ?? '通知';
+        $popupMessage = $post->popup_message ?? '時間になりました！';
+
+        // PowerShell の中身（CP932で保存 → 日本語OK）
+        $script = "(New-Object -ComObject Wscript.Shell).Popup('$popupMessage',0,'$popupTitle',64)";
+        file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8'));
+
+        // ★ タスクスケジューラ登録
+        $command = 'powershell -Command "'
+            . '$action = New-ScheduledTaskAction -Execute \'%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe\' '
+            . '-Argument \'-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"' . $filePath . '\"\' ; '
+            . '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; '
+            . 'Register-ScheduledTask -TaskName \'' . $post->title . '\''
+            . ' -Description \'' . ($post->body ?? '') . '\''
+            . ' -Action $action -Trigger $trigger -Force"';
+    }
+
     exec($command, $output, $result);
 
     if ($result !== 0) {
         \Log::error("Register-ScheduledTask failed (store)", [
             'command' => $command,
-            'output'  => $output,
+            'output' => $output,
         ]);
-        return redirect()->back()->withErrors(['task_error' => 'タスクスケジューラ登録に失敗しました']);
+        return redirect()->back()->withErrors(['task_error' => 'タスク登録に失敗しました']);
     }
 
-    // ★ 成功したら画面遷移
     return redirect()->route('posts.index')->with('success', 'タスクを登録しました');
     }
 
@@ -150,10 +189,13 @@ class PostController extends Controller
     $validated = $request->validate([
         'title' => 'required|max:255|unique:posts,title,'.$id,
         'body' => 'nullable',
-        'program_path' => 'required',
-        'arguments' => 'nullable',
         'run_datetime' => 'required|date',
         'screenshot' => 'nullable|image|max:2048',
+        'action_type' => 'required|in:program,popup',
+        'program_path' => 'nullable|required_if:action_type,program',
+        'arguments' => 'nullable',
+        'popup_title' => 'nullable|required_if:action_type,popup',
+        'popup_message' => 'nullable|required_if:action_type,popup',
     ]);
 
     $post = Post::findOrFail($id);
@@ -171,12 +213,16 @@ class PostController extends Controller
     $post->fill([
         'title' => $validated['title'],
         'body' => $validated['body'] ?? null,
-        'program_path' => $validated['program_path'],
-        'arguments' => $validated['arguments'] ?? null,
         'run_datetime' => $validated['run_datetime'],
+        'action_type' => $validated['action_type'],
+        'program_path' => $validated['program_path'] ?? null,
+        'arguments' => $validated['arguments'] ?? null,
+        'popup_title' => $validated['popup_title'] ?? null,
+        'popup_message' => $validated['popup_message'] ?? null,
     ]);
-    $changed = $post->getDirty(); // どのカラムが変わったか取得
+    $changed = $post->getDirty();
     $post->save();
+
 
     // ★ スクショだけ更新ならタスク再登録スキップ
     if (array_keys($changed) === ['screenshot_path']) {

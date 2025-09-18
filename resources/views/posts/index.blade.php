@@ -27,7 +27,7 @@
             <button type="submit" style="color: gray;">☆</button>
         </form>
     @endif
-    <p>お気に入り数: {{ $post->favorites_count }}00</p>
+    <p>お気に入り数: {{ $post->favorites_count }}</p>
     <p>投稿者: {{ $post->user->name }}</p>
 
     @if ($post->screenshot_path)

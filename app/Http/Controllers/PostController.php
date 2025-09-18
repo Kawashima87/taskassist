@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Models\Favorite;
+use Illuminate\Support\Facades\Log;
 
 class PostController extends Controller
 {
@@ -56,32 +57,61 @@ class PostController extends Controller
      */
     public function store(Request $request)//!データの新規保存 store
     {
-        $validated = $request->validate([
-            'title' => 'required|unique:posts|max:255',
-            'body' => 'nullable',
-            'program_path' => 'required',
-            'arguments' => 'nullable',
-            'run_datetime' => 'required|date',
-            'screenshot' => 'nullable|image|max:2048',
+    $validated = $request->validate([
+        'title' => 'required|unique:posts|max:255',
+        'body' => 'nullable',
+        'program_path' => 'required',
+        'arguments' => 'nullable',
+        'run_datetime' => 'required|date',
+        'screenshot' => 'nullable|image|max:2048',
+    ]);
+
+    $screenshotPath = null;
+    if ($request->hasFile('screenshot')) {
+        $screenshotPath = $request->file('screenshot')->store('screenshots', 'public');
+    }
+
+    // ★ まずDB保存
+    $post = Post::create([
+        'user_id' => auth()->id(),
+        'title' => $validated['title'],
+        'body' => $validated['body'] ?? null,
+        'program_path' => $validated['program_path'],
+        'arguments' => $validated['arguments'] ?? null,
+        'run_datetime' => $validated['run_datetime'],
+        'enabled' => true,
+        'screenshot_path' => $screenshotPath,
+    ]);
+
+    // タスクスケジューラー登録
+    $title = $post->title;
+    $desc  = $post->body ?? '';
+    $program = $post->program_path;
+    $args = $post->arguments ?? '';
+    $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');//このフォーマットじゃないと「Y-MM-dd HH:mm」は繰り返してて重複するからダメ。
+
+    // PowerShell コマンド
+    $command = 'powershell -Command "'
+        . '$action = New-ScheduledTaskAction -Execute \'' . $program . '\' '
+        . ($args !== '' ? ' -Argument \'' . $args . '\'' : '') . '; '
+        . '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; '
+        . 'Register-ScheduledTask -TaskName \'' . $title . '\''
+        . ' -Description \'' . $desc . '\''
+        . ' -Action $action -Trigger $trigger -Force"';
+
+    // 同期実行（まずは確実に登録できることを確認する）
+    exec($command, $output, $result);
+
+    if ($result !== 0) {
+        \Log::error("Register-ScheduledTask failed (store)", [
+            'command' => $command,
+            'output'  => $output,
         ]);
+        return redirect()->back()->withErrors(['task_error' => 'タスクスケジューラ登録に失敗しました']);
+    }
 
-        $screenshotPath = null;
-        if ($request->hasFile('screenshot')) {
-            $screenshotPath = $request->file('screenshot')->store('screenshots', 'public');
-        }
-
-        Post::create([
-            'user_id' => auth()->id(),
-            'title' => $validated['title'],
-            'body' => $validated['body'] ?? null,
-            'program_path' => $validated['program_path'],
-            'arguments' => $validated['arguments'] ?? null,
-            'run_datetime' => $validated['run_datetime'],
-            'enabled' => true,
-            'screenshot_path' => $screenshotPath, // ← DBに保存される
-        ]);
-
-        return redirect()->route('posts.index')->with('success', 'タスクを登録しました');
+    // ★ 成功したら画面遷移
+    return redirect()->route('posts.index')->with('success', 'タスクを登録しました');
     }
 
     /**
@@ -117,32 +147,79 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)//!データの更新 update
     {
-        $validated = $request->validate([
-            'title' => 'required|max:255|unique:posts,title,'.$id,
-            'body' => 'nullable',
-            'program_path' => 'required',
-            'arguments' => 'nullable',
-            'run_datetime' => 'required|date',
-            'screenshot' => 'nullable|image|max:2048',
-        ]);
+    $validated = $request->validate([
+        'title' => 'required|max:255|unique:posts,title,'.$id,
+        'body' => 'nullable',
+        'program_path' => 'required',
+        'arguments' => 'nullable',
+        'run_datetime' => 'required|date',
+        'screenshot' => 'nullable|image|max:2048',
+    ]);
 
-        $post = \App\Models\Post::findOrFail($id);
+    $post = Post::findOrFail($id);
 
-        // スクショ更新
-        if ($request->hasFile('screenshot')) {
-            $screenshotPath = $request->file('screenshot')->store('screenshots', 'public');
-            $post->screenshot_path = $screenshotPath;
+    // ★ 更新前のタイトルを保持
+    $oldTitle = $post->title;
+
+    // スクショ更新
+    if ($request->hasFile('screenshot')) {
+        $screenshotPath = $request->file('screenshot')->store('screenshots', 'public');
+        $post->screenshot_path = $screenshotPath;
+    }
+
+    // DB更新（先に fill → save して変更検知を使う）
+    $post->fill([
+        'title' => $validated['title'],
+        'body' => $validated['body'] ?? null,
+        'program_path' => $validated['program_path'],
+        'arguments' => $validated['arguments'] ?? null,
+        'run_datetime' => $validated['run_datetime'],
+    ]);
+    $changed = $post->getDirty(); // どのカラムが変わったか取得
+    $post->save();
+
+    // ★ スクショだけ更新ならタスク再登録スキップ
+    if (array_keys($changed) === ['screenshot_path']) {
+        return redirect()->route('posts.show', $post->id)->with('success', '画像だけ更新しました（タスク再登録なし）');
+    }
+
+    // ★ 古いタイトルと違っていたら削除
+    if ($oldTitle !== $post->title) {
+        $deleteCommand = 'powershell -Command "Unregister-ScheduledTask -TaskName ' . escapeshellarg($oldTitle) . ' -Confirm:$false"';
+        exec($deleteCommand, $delOutput, $delResult);
+        if ($delResult !== 0) {
+            \Log::warning("古いタスク削除失敗", [
+                'command' => $deleteCommand,
+                'output'  => $delOutput,
+            ]);
         }
+    }
 
-        $post->update([
-            'title' => $validated['title'],
-            'body' => $validated['body'] ?? null,
-            'program_path' => $validated['program_path'],
-            'arguments' => $validated['arguments'] ?? null,
-            'run_datetime' => $validated['run_datetime'],
+    // ★ 新しいタスクを再登録（必要な場合のみ）
+    $title = escapeshellarg($post->title);
+    $program = $post->program_path; // ここは escapeshellarg 不要
+    $args    = $post->arguments ?? '';
+    $args = $post->arguments ? ' -Argument ' . escapeshellarg($post->arguments) : '';
+    $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');
+
+    $command = 'powershell -Command "'
+        . '$action = New-ScheduledTaskAction -Execute \'' . $program . '\' ' 
+        . ($args ? ' -Argument \'' . $args . '\'' : '') . '; '
+        . '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; '
+        . 'Register-ScheduledTask -TaskName \'' . $post->title . '\''
+        . ' -Description \'' . ($post->body ?? '') . '\''
+        . ' -Action $action -Trigger $trigger -Force"';
+
+    exec($command, $output, $result);
+
+    if ($result !== 0) {
+        \Log::error("新タスク登録失敗 (update)", [
+            'command' => $command,
+            'output'  => $output,
         ]);
+    }
 
-        return redirect()->route('posts.show', $post->id)->with('success', 'タスクを更新しました');
+    return redirect()->route('posts.show', $post->id)->with('success', 'タスクを更新しました');
     }
 
     /**
@@ -153,9 +230,27 @@ class PostController extends Controller
      */
     public function destroy($id)//!データの削除 destroy
     {
-        $post = \App\Models\Post::findOrFail($id);
-        $post->delete();
-        return redirect()->route('posts.index')->with('success', 'タスクを削除しました');
+    $post = \App\Models\Post::findOrFail($id);
+
+    // ★ タスクスケジューラから削除
+    $deleteCommand = 'powershell -Command "Unregister-ScheduledTask -TaskName ' 
+        . escapeshellarg($post->title) 
+        . ' -Confirm:$false"';
+    exec($deleteCommand, $output, $result);
+
+    if ($result !== 0) {
+        // タスク削除失敗 → DB削除もしない
+        \Log::error("タスク削除失敗", [
+            'command' => $deleteCommand,
+            'output'  => $output,
+        ]);
+        return back()->withErrors('タスクスケジューラからの削除に失敗しました。');
+    }
+
+    // ★ DBからも削除
+    $post->delete();
+
+    return redirect()->route('posts.index')->with('success', 'タスクを削除しました');
     }
 
     public function mypage(Request $request)

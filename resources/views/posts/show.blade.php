@@ -26,11 +26,22 @@
 <hr>
 
 <dl>
-    <dt>実行ファイルのパス</dt>
-    <dd>{{ $post->program_path }}</dd>
-
-    <dt>引数</dt>
-    <dd>{{ $post->arguments ?? '（なし）' }}</dd>
+    <dt>操作種別</dt>
+    <dd>
+        @if ($post->action_type === 'program')
+            アプリ実行
+                <dt>実行ファイルのパス</dt>
+                <dd>{{ $post->program_path ?? '（なし）' }}</dd>
+                <dt>引数</dt>
+                <dd>{{ $post->arguments ?? '（なし）' }}</dd>
+        @elseif ($post->action_type === 'popup')
+            ポップアップ通知
+                <dt>ポップアップタイトル</dt>
+                <dd>{{ $post->popup_title ?? '（なし）' }}</dd>
+                <dt>ポップアップメッセージ</dt>
+                <dd>{{ $post->popup_message ?? '（なし）' }}</dd>
+        @endif
+    </dd>
 
     <dt>実行日時</dt>
     <dd>{{ $post->run_datetime }}</dd>
@@ -38,6 +49,7 @@
     <dt>有効状態</dt>
     <dd>{{ $post->enabled ? '有効' : '停止中' }}</dd>
 </dl>
+
 
 <a href="{{ route('posts.index') }}">← 一覧に戻る</a>
 @auth

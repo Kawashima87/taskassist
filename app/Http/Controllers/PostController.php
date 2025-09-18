@@ -114,7 +114,13 @@ class PostController extends Controller
 
         // PowerShell の中身（CP932で保存 → 日本語OK）
         $script = "(New-Object -ComObject Wscript.Shell).Popup('$popupMessage',0,'$popupTitle',64)";
-        file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8'));
+        if (file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8')) === false) {
+            \Log::error("ps1ファイルの書き込み失敗", ['filePath' => $filePath]);
+        }
+
+        // ★ ps1_path を保存
+        $post->ps1_path = $filePath;
+        $post->save();
 
         // ★ タスクスケジューラ登録
         $command = 'powershell -Command "'
@@ -215,14 +221,26 @@ class PostController extends Controller
 
     // 古い ps1 ファイル削除（popup の場合）
     if ($oldPs1 && file_exists($oldPs1)) {
-        unlink($oldPs1);
+        if (!unlink($oldPs1)) {
+            \Log::warning("ps1ファイル削除失敗", ['filePath' => $oldPs1]);
+        }
     }
 
     // ★ 新しいタスクを登録
     $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');
 
     if ($post->action_type === 'program') {
-        // 省略（現状のままでOK）
+        $program = $post->program_path;
+        $args = $post->arguments ?? '';
+
+    $command = 'powershell -Command "' .
+        '$action = New-ScheduledTaskAction -Execute \'' . $program . '\' ' .
+        ($args !== '' ? ' -Argument \'' . $args . '\'' : '') . '; ' .
+        '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; ' .
+        'Register-ScheduledTask -TaskName \'' . $post->title . '\'' .
+        ' -Description \'' . ($post->body ?? '') . '\'' .
+        ' -Action $action -Trigger $trigger -Force"';
+        
     } elseif ($post->action_type === 'popup') {
         // ★ PowerShellファイル生成
         $filename = 'popup_' . uniqid() . '.ps1';
@@ -230,7 +248,10 @@ class PostController extends Controller
         $popupTitle   = $post->popup_title ?? '通知';
         $popupMessage = $post->popup_message ?? '時間になりました！';
         $script = "(New-Object -ComObject Wscript.Shell).Popup('$popupMessage',0,'$popupTitle',64)";
-        file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8'));
+        if (file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8')) === false) {
+            \Log::error("ps1ファイルの書き込み失敗", ['filePath' => $filePath]);
+        }
+
 
         // ★ ps1_path を更新
         $post->ps1_path = $filePath;
@@ -284,7 +305,9 @@ class PostController extends Controller
 
     // ★ ps1ファイル削除（popup の場合）
     if ($post->ps1_path && file_exists($post->ps1_path)) {
-        unlink($post->ps1_path);
+        if (!unlink($post->ps1_path)) {
+            \Log::warning("ps1ファイル削除失敗", ['filePath' => $post->ps1_path]);
+        }
     }
 
     // ★ DB削除

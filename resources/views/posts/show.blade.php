@@ -26,22 +26,23 @@
 <hr>
 
 <dl>
-    <dt>操作種別</dt>
-    <dd>
-        @if ($post->action_type === 'program')
-            アプリ実行
-                <dt>実行ファイルのパス</dt>
-                <dd>{{ $post->program_path ?? '（なし）' }}</dd>
-                <dt>引数</dt>
-                <dd>{{ $post->arguments ?? '（なし）' }}</dd>
-        @elseif ($post->action_type === 'popup')
-            ポップアップ通知
-                <dt>ポップアップタイトル</dt>
-                <dd>{{ $post->popup_title ?? '（なし）' }}</dd>
-                <dt>ポップアップメッセージ</dt>
-                <dd>{{ $post->popup_message ?? '（なし）' }}</dd>
-        @endif
-    </dd>
+<dt>操作種別</dt>
+<dd>{{ $post->action_type === 'program' ? 'アプリ実行' : 'ポップアップ通知' }}</dd>
+
+@if ($post->action_type === 'program')
+    <dt>実行ファイルのパス</dt>
+    <dd>{{ $post->program_path ?? '（なし）' }}</dd>
+
+    <dt>引数</dt>
+    <dd>{{ $post->arguments ?? '（なし）' }}</dd>
+@elseif ($post->action_type === 'popup')
+    <dt>ポップアップタイトル</dt>
+    <dd>{{ $post->popup_title ?? '（なし）' }}</dd>
+
+    <dt>ポップアップメッセージ</dt>
+    <dd>{{ $post->popup_message ?? '（なし）' }}</dd>
+@endif
+
 
     <dt>実行日時</dt>
     <dd>{{ $post->run_datetime }}</dd>

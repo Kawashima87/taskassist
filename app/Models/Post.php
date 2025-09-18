@@ -21,6 +21,7 @@ class Post extends Model
         'action_type',
         'popup_title',
         'popup_message',
+        'ps1_path',
     ];
 
     //投稿者とのリレーション

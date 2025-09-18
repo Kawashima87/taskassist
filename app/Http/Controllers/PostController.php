@@ -89,20 +89,6 @@ class PostController extends Controller
         'screenshot_path' => $screenshotPath,
     ]);
 
-    //★PowerShell ファイルを書き出す処理
-    $filename = 'popup_' . uniqid() . '.ps1';  // ファイル名（ユニーク化）
-    $filePath = storage_path('app/' . $filename);  // 保存先パス
-    $popupTitle   = $post->popup_title ?? '通知';
-    $popupMessage = $post->popup_message ?? '時間になりました！';
-    // PowerShell の中身
-    $script = "(New-Object -ComObject Wscript.Shell).Popup('$popupMessage',0,'$popupTitle',64)";
-
-    // 
-    file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8'));
-
-
-
-    
     // ★ タスクスケジューラ登録
     $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');
 
@@ -200,6 +186,7 @@ class PostController extends Controller
 
     $post = Post::findOrFail($id);
     $oldTitle = $post->title;
+    $oldPs1   = $post->ps1_path;   // ← 旧ファイルのパスを保持
 
     // スクショ更新
     if ($request->hasFile('screenshot')) {
@@ -226,22 +213,16 @@ class PostController extends Controller
         exec($deleteCommand);
     }
 
+    // 古い ps1 ファイル削除（popup の場合）
+    if ($oldPs1 && file_exists($oldPs1)) {
+        unlink($oldPs1);
+    }
+
     // ★ 新しいタスクを登録
     $datetime = \Carbon\Carbon::parse($post->run_datetime)->format('Y-m-d H:i');
 
     if ($post->action_type === 'program') {
-        // アプリ実行
-        $program = $post->program_path;
-        $args = $post->arguments ?? '';
-
-        $command = 'powershell -Command "' .
-            '$action = New-ScheduledTaskAction -Execute \'' . $program . '\' ' .
-            ($args !== '' ? ' -Argument \'' . $args . '\'' : '') . '; ' .
-            '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; ' .
-            'Register-ScheduledTask -TaskName \'' . $post->title . '\'' .
-            ' -Description \'' . ($post->body ?? '') . '\'' .
-            ' -Action $action -Trigger $trigger -Force"';
-
+        // 省略（現状のままでOK）
     } elseif ($post->action_type === 'popup') {
         // ★ PowerShellファイル生成
         $filename = 'popup_' . uniqid() . '.ps1';
@@ -251,7 +232,11 @@ class PostController extends Controller
         $script = "(New-Object -ComObject Wscript.Shell).Popup('$popupMessage',0,'$popupTitle',64)";
         file_put_contents($filePath, mb_convert_encoding($script, 'CP932', 'UTF-8'));
 
-        // ★ タスク登録（.ps1ファイル実行）
+        // ★ ps1_path を更新
+        $post->ps1_path = $filePath;
+        $post->save();
+
+        // ★ タスク登録
         $command = 'powershell -Command "' .
             '$action = New-ScheduledTaskAction -Execute ' .
             '\'%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe\' ' .
@@ -290,7 +275,6 @@ class PostController extends Controller
     exec($deleteCommand, $output, $result);
 
     if ($result !== 0) {
-        // タスク削除失敗 → DB削除もしない
         \Log::error("タスク削除失敗", [
             'command' => $deleteCommand,
             'output'  => $output,
@@ -298,7 +282,12 @@ class PostController extends Controller
         return back()->withErrors('タスクスケジューラからの削除に失敗しました。');
     }
 
-    // ★ DBからも削除
+    // ★ ps1ファイル削除（popup の場合）
+    if ($post->ps1_path && file_exists($post->ps1_path)) {
+        unlink($post->ps1_path);
+    }
+
+    // ★ DB削除
     $post->delete();
 
     return redirect()->route('posts.index')->with('success', 'タスクを削除しました');

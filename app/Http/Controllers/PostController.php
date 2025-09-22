@@ -261,7 +261,7 @@ class PostController extends Controller
         $command = 'powershell -Command "' .
             '$action = New-ScheduledTaskAction -Execute ' .
             '\'%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe\' ' .
-            ' -Argument \'-File ' . $filePath . '\'; ' .
+            ' -Argument \'-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -File \"' . $filePath . '\"\' ; ' .
             '$trigger = New-ScheduledTaskTrigger -Once -At \'' . $datetime . '\'; ' .
             'Register-ScheduledTask -TaskName \'' . $post->title . '\'' .
             ' -Description \'' . ($post->body ?? '') . '\'' .

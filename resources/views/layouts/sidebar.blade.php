@@ -13,17 +13,17 @@
             TaskAssist
         </div>
         <nav class="flex-1 p-4 space-y-2">
-            <a href="{{ route('posts.index') }}" class="block px-3 py-2 rounded hover:bg-gray-700">Home</a>
-            <a href="{{ route('posts.create') }}" class="block px-3 py-2 rounded hover:bg-gray-700">New Create</a>
-            <a href="{{ route('posts.mypage') }}" class="block px-3 py-2 rounded hover:bg-gray-700">My Page</a>
+            <a href="{{ route('posts.index') }}" class="block px-3 py-2 rounded hover:bg-gray-700">ホーム</a>
+            <a href="{{ route('posts.create') }}" class="block px-3 py-2 rounded hover:bg-gray-700">新規作成</a>
+            <a href="{{ route('posts.mypage') }}" class="block px-3 py-2 rounded hover:bg-gray-700">アカウント</a>
 
             {{-- 管理者用メニュー --}}
             @if(auth()->check() && auth()->user()->is_admin)
                 <div>
                     <p class="px-3 py-2 font-semibold">管理者</p>
-                    <a href="{{ route('admin.users.index') }}" class="block px-3 py-1 rounded hover:bg-gray-700">ユーザー情報</a>
+                    <a href="{{ route('admin.users') }}" class="block px-3 py-1 rounded hover:bg-gray-700">ユーザー情報</a>
                     <a href="{{ route('admin.logs') }}" class="block px-3 py-1 rounded hover:bg-gray-700">エラーログ</a>
-                    <a href="{{ route('admin.ps1') }}" class="block px-3 py-1 rounded hover:bg-gray-700">残ps1管理</a>
+                    <a href="{{ route('admin.ps1') }}" class="block px-3 py-1 rounded hover:bg-gray-700">ps1管理</a>
                 </div>
             @endif
         </nav>

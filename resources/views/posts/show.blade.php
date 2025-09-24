@@ -1,3 +1,8 @@
+@extends('layouts.sidebar')
+
+@section('content')
+<h1 class="text-xl font-bold mb-4">投稿詳細</h1>
+
 <h2>{{ $post->title }}</h2>
 @if ($post->isFavoritedBy(auth()->user()))
     {{-- お気に入り解除 --}}
@@ -13,13 +18,24 @@
         <button type="submit" style="color: gray;">☆ お気に入り</button>
     </form>
 @endif
-<p>投稿者: {{ $post->user->name }}</p>
-
+<p>
+    <img src="{{ $post->user->icon_url }}" 
+        alt="ユーザーアイコン" 
+        style="width:50px; height:50px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle,;">
+    {{ $post->user->name }}
+<p>
 @if ($post->screenshot_path)
-    <img src="{{ asset('storage/'.$post->screenshot_path) }}" 
-            alt="スクショ" 
-            style="max-width:300px; height:auto;">
+    <div style="width:450px; height:250px; border-radius:15px; background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; border:3px solid #000;">
+        <img src="{{ asset('storage/' . $post->screenshot_path) }}"
+             alt="スクショ"
+             style="max-width:100%; max-height:100%; object-fit:contain;">
+    </div>
+@else
+    <div style="width:450px; height:250px; border-radius:15px; background:#ffffff; display:flex; align-items:center; justify-content:center; color:#555; border:3px solid #000;">
+        [画像なし]
+    </div>
 @endif
+
 
 <p>{{ $post->body }}</p>
 
@@ -63,4 +79,5 @@
         </form>
     @endif
 @endauth
+@endsection
 

@@ -62,4 +62,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Post::class, 'favorites')->withTimestamps();
     }
+
+    //アイコン
+    public function getIconUrlAttribute()
+    {
+        if($this->icon_path && file_exists(storage_path('app/public/'.$this->icon_path))){
+            return asset('storage/'.$this->icon_path);
+        }
+        return asset('storage/icons/default.png');//デフォルトアイコン
+    }
 }

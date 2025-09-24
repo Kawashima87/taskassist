@@ -9,9 +9,6 @@ use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
-    public function index() {
-        return view('admin.index');
-    }
 
     // ① ユーザー管理
     public function users(Request $request) {

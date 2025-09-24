@@ -1,4 +1,7 @@
-<h2>タスク編集</h2>
+@extends('layouts.sidebar')
+
+@section('content')
+<h1 class="text-xl font-bold mb-4">タスク編集</h1>
 
 <form id="editTaskForm" action="{{ route('posts.update', $post->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
@@ -88,3 +91,5 @@ document.getElementById('editTaskForm').addEventListener('submit', function (e) 
     }
 });
 </script>
+
+@endsection

@@ -1,7 +1,11 @@
+@extends('layouts.sidebar')
+
+@section('content')
+<h1 class="text-xl font-bold mb-4">新規作成</h1>
+
 <form id="taskForm" action="{{ route('posts.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
-    <button type="button">☆</button>
     画像 <input type="file" name="screenshot"><br>
     タイトル <input type="text" name="title"><br>
     説明 <input type="text" name="body"><br>
@@ -61,3 +65,5 @@ document.getElementById('taskForm').addEventListener('submit', function (e) {
     }
 });
 </script>
+
+@endsection

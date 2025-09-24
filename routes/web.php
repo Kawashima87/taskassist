@@ -36,8 +36,6 @@ require __DIR__.'/auth.php';
 //!タイムスケジューラ
 
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('admin.users.index');
-
     // ① ユーザー管理
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');

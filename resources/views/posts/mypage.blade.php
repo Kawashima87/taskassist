@@ -1,4 +1,15 @@
-<h2>My Page</h2>
+@extends('layouts.sidebar')
+
+@section('content')
+<h1 class="text-xl font-bold mb-4">アカウント</h1>
+
+
+<p>
+    <img src="{{auth()->user()->icon_url }}" 
+        alt="ユーザーアイコン" 
+        style="width:150px; height:150px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle;">
+    {{ auth()->user()->name }}
+</p>
 
 {{-- トグルボタン --}}
 <div style="margin-bottom: 20px;">
@@ -37,12 +48,23 @@
         @endif
 
         <p>お気に入り数: {{ $post->favorites_count ?? $post->favorites->count() }}</p>
-        <p>投稿者: {{ $post->user->name }}</p>
+        <p>
+            <img src="{{ $post->user->icon_url }}" 
+                alt="ユーザーアイコン" 
+                style="width:50px; height:50px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle;">
+            {{ $post->user->name }}
+        </p>
 
         @if ($post->screenshot_path)
-            <img src="{{ asset('storage/'.$post->screenshot_path) }}" alt="実行結果" style="width:150px; height:auto;">
+            <div style="width:450px; height:250px; border-radius:15px; background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; border:3px solid #000;">
+                <img src="{{ asset('storage/' . $post->screenshot_path) }}"
+                    alt="スクショ"
+                    style="max-width:100%; max-height:100%; object-fit:contain;">
+            </div>
         @else
-            <span>[画像なし]</span>
+            <div style="width:450px; height:250px; border-radius:15px; background:#ffffff; display:flex; align-items:center; justify-content:center; color:#555; border:3px solid #000;">
+                [画像なし]
+            </div>
         @endif
 
         <h3>{{ $post->title }}</h3>
@@ -64,3 +86,4 @@
         'sort' => $sort ?? ''
     ])->links() }}
 </div>
+@endsection

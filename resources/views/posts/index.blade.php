@@ -1,3 +1,10 @@
+@extends('layouts.sidebar')
+
+@section('content')
+    <h1 class="text-xl font-bold mb-4">投稿一覧</h1>
+    {{-- 投稿リスト --}}
+@endsection
+
 {{-- 検索フォーム --}}
 <form action="{{ route('posts.index') }}" method="GET" style="margin-bottom: 20px;">
 

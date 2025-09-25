@@ -8,7 +8,7 @@
 <body class="flex min-h-screen bg-gray-100">
 
     {{-- サイドバー --}}
-    <aside class="w-64 bg-gray-900 text-white flex flex-col">
+    <aside class="fixed top-0 left-0 h-screen w-64 bg-gray-900 text-white flex flex-col">
         <div class="p-4 text-2xl font-bold border-b border-gray-700">
             TaskAssist
         </div>
@@ -30,7 +30,7 @@
     </aside>
 
     {{-- メインコンテンツ --}}
-    <main class="flex-1 p-6">
+    <main class="ml-64 flex-1 p-6  overflow-y-auto">
         @yield('content')
     </main>
 

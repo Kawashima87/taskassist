@@ -12,6 +12,7 @@
     ])
 
 </head>
+@stack('scripts')
 <body class="flex min-h-screen bg-gray-100">
 
 {{-- サイドバー --}}

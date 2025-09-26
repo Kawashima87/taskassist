@@ -8,76 +8,135 @@
     <form action="{{ route('posts.index') }}" method="GET" class="search-bar">
         <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="タイトルや説明で検索">
 
-    {{-- カスタムドロップダウン --}}
-    <div class="custom-dropdown">
-        <input type="hidden" name="sort" id="sortInput" value="{{ $sort ?? '' }}">
-        <button type="button" class="dropdown-toggle" onclick="toggleDropdown()">
-            {{ $sort === 'old' ? '古い順' : ($sort === 'favorites' ? '人気順' : '新しい順') }}
-            <span class="arrow">▼</span>
-        </button>
-        <ul class="dropdown-menu" id="dropdownMenu">
-            <li onclick="selectOption('')">新しい順</li>
-            <li onclick="selectOption('old')">古い順</li>
-            <li onclick="selectOption('favorites')">人気順</li>
-        </ul>
-    </div>
-
+        {{-- 並び替えドロップダウン --}}
+        <div class="custom-dropdown">
+            <input type="hidden" name="sort" id="sortInput" value="{{ $sort ?? '' }}">
+            <button type="button" class="dropdown-toggle" onclick="toggleDropdown()">
+                {{ $sort === 'old' ? '古い順' : ($sort === 'favorites' ? '人気順' : '新しい順') }}
+                <span class="arrow">▼</span>
+            </button>
+            <ul class="dropdown-menu" id="dropdownMenu">
+                <li onclick="selectOption('')">新しい順</li>
+                <li onclick="selectOption('old')">古い順</li>
+                <li onclick="selectOption('favorites')">人気順</li>
+            </ul>
+        </div>
 
         <button type="submit" class="search-button">検索</button>
     </form>
 
-    {{-- 区切り線 --}}
     <hr class="divider">
 
-    {{-- 投稿一覧（Gridで整列） --}}
+    {{-- 投稿一覧 --}}
     <div class="post-list">
         @foreach($posts as $post)
             <div class="post-card">
+                
+                {{-- ヘッダー --}}
                 <div class="post-card__header">
                     <img src="{{ $post->user->icon_url }}" alt="ユーザーアイコン" class="post-card__icon">
                     <span class="post-card__username">{{ $post->user->name }}</span>
                 </div>
 
-                <div class="post-card__image">
-                    @if ($post->screenshot_path)
-                        <img src="{{ asset('storage/' . $post->screenshot_path) }}" alt="スクショ">
-                    @else
-                        <span>[画像なし]</span>
-                    @endif
+                {{-- ファーストコンテンツ（画像 + タイトル/説明） --}}
+                <div class="post-card__first">
+                    <div class="post-card__image">
+                        @if ($post->screenshot_path)
+                            <img src="{{ asset('storage/' . $post->screenshot_path) }}" alt="スクショ">
+                        @else
+                            <span>[画像なし]</span>
+                        @endif
+                    </div>
+                    <div class="post-card__main">
+                        <h3 class="post-card__title">{{ $post->title }}</h3>
+                        <p class="post-card__description">{{ $post->body }}</p>
+                    </div>
                 </div>
 
-                <h3 class="post-card__title">{{ $post->title }}</h3>
-                <p class="post-card__description">{{ $post->body }}</p>
+                {{-- セカンドコンテンツ（詳細情報：もっと見るで開閉） --}}
+                <div class="post-card__second">
+                    <dl>
+                        <dt>操作種別</dt>
+                        <dd>{{ $post->action_type === 'program' ? 'アプリ実行' : 'ポップアップ通知' }}</dd>
 
+                        @if ($post->action_type === 'program')
+                            <dt>実行ファイルのパス</dt>
+                            <dd>{{ $post->program_path ?? '（なし）' }}</dd>
+                            <dt>引数</dt>
+                            <dd>{{ $post->arguments ?? '（なし）' }}</dd>
+                        @else
+                            <dt>ポップアップタイトル</dt>
+                            <dd>{{ $post->popup_title ?? '（なし）' }}</dd>
+                            <dt>ポップアップメッセージ</dt>
+                            <dd>{{ $post->popup_message ?? '（なし）' }}</dd>
+                        @endif
+
+                        <dt>実行日時</dt>
+                        <dd>{{ $post->run_datetime }}</dd>
+                        <dt>有効状態</dt>
+                        <dd>{{ $post->enabled ? '有効' : '停止中' }}</dd>
+                    </dl>
+                </div>
+
+                {{-- フッター --}}
                 <div class="post-card__footer">
-                    @if ($post->isFavoritedBy(auth()->user()))
-                        <form action="{{ route('favorites.destroy', $post->id) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="favorite-button active">★</button>
-                        </form>
-                    @else
-                        <form action="{{ route('favorites.store', $post->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="favorite-button">☆</button>
-                        </form>
-                    @endif
-                    <span>{{ $post->favorites_count }}</span>
-                    <a href="{{ route('posts.show', $post->id) }}" class="detail-button">詳細</a>
+                    
+                    {{-- 左：お気に入り --}}
+                    <div class="post-card__footer-left">
+                        @if ($post->isFavoritedBy(auth()->user()))
+                            <form action="{{ route('favorites.destroy', $post->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="favorite-button active">★</button>
+                            </form>
+                        @else
+                            <form action="{{ route('favorites.store', $post->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="favorite-button">☆</button>
+                            </form>
+                        @endif
+                        <span>{{ $post->favorites_count }}</span>
+                    </div>
+
+                    {{-- 中央：もっと見る --}}
+                    <div class="post-card__footer-center">
+                        <button type="button" class="more-button"
+                                onclick="toggleDetails(this)">もっと見る</button>
+                    </div>
+
+                    {{-- 右：編集削除 --}}
+                    <div class="post-card__footer-right">
+                        @auth
+                            @if ($post->user_id === auth()->id())
+                                <a href="{{ route('posts.edit', $post->id) }}" class="edit-button">編集</a>
+                                <form action="{{ route('posts.destroy', $post->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="delete-button"
+                                            onclick="return confirm('本当に削除しますか？')">削除</button>
+                                </form>
+                            @endif
+                        @endauth
+                    </div>
                 </div>
+
             </div>
         @endforeach
     </div>
 
+    {{-- ページネーション --}}
     <div class="pagination-area">
         {{ $posts->appends(['search' => $search ?? '', 'sort' => $sort ?? ''])->links() }}
     </div>
-    <script>
-    function toggleDropdown() {
-        document.getElementById('dropdownMenu').style.display =
-            document.getElementById('dropdownMenu').style.display === 'block' ? 'none' : 'block';
-    }
+@endsection
 
+@push('scripts')
+<script>
+    // ドロップダウン制御
+    function toggleDropdown() {
+        const menu = document.getElementById('dropdownMenu');
+        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    }
     function selectOption(value) {
         document.getElementById('sortInput').value = value;
         document.querySelector('.dropdown-toggle').childNodes[0].nodeValue =
@@ -85,6 +144,15 @@
             value === 'favorites' ? '人気順' : '新しい順';
         document.getElementById('dropdownMenu').style.display = 'none';
     }
-    </script>
 
-@endsection
+    // 詳細開閉制御
+    function toggleDetails(button) {
+        const card = button.closest('.post-card');
+        const details = card.querySelector('.post-card__second');
+        console.log(details); // ← ちゃんと取れているか確認
+        details.classList.toggle('open');
+        button.textContent = details.classList.contains('open') ? '閉じる' : 'もっと見る';
+    }
+
+</script>
+@endpush

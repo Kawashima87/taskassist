@@ -1,4 +1,4 @@
-/* ===== 投稿一覧（一列表示・幅90%） ===== */
+/* ===== 投稿一覧 ===== */
 .post-list {
     display: flex;
     flex-direction: column;
@@ -7,27 +7,26 @@
     margin-bottom: 20px;
 }
 
-/* ===== 投稿カード ===== */
+/* ===== 投稿カード（Grid） ===== */
 .post-card {
-    width: 90%;             /* 画面幅の90%を占める */
-    aspect-ratio: 16 / 9;   /* 横長比率を維持 */
+    width: 90%;
     border: 2px solid #333;
     border-radius: 12px;
     background: #fff;
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-
-    display: flex;
-    flex-direction: column;
     padding: 1rem;
     box-sizing: border-box;
+
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    gap: 0.5rem;
 }
 
-/* ===== ヘッダー：左上にアイコン＋名前 ===== */
+/* ===== ヘッダー ===== */
 .post-card__header {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 0.5rem;
 }
 .post-card__icon {
     width: clamp(28px, 3vw, 40px);
@@ -40,46 +39,121 @@
     font-size: clamp(0.9rem, 1.2vw, 1rem);
 }
 
-/* ===== 画像（カード比率に応じて拡縮） ===== */
+/* ===== ファーストコンテンツ（左右分割） ===== */
+.post-card__first {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr; /* 左：画像 / 右：タイトル説明 */
+    gap: 1rem;
+    align-items: start;
+}
 .post-card__image {
-    flex: 1;                     /* カード比率に合わせた枠 */
+    width: 100%;
+    aspect-ratio: 16 / 9;
     background: #f5f5f5;
     border: 1px solid #ccc;
     border-radius: 8px;
     display: flex;
-    align-items: center;          /* 縦中央 */
-    justify-content: center;      /* 横中央 */
-    overflow: hidden;             /* 万一はみ出した時の保険 */
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 .post-card__image img {
-    max-width: 100%;              /* 枠を超えない */
-    max-height: 100%;             /* 枠を超えない */
-    width: auto;                  /* 元の比率を維持 */
-    height: auto;                 /* 元の比率を維持 */
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
-
-
-/* ===== タイトル & 説明文 ===== */
+.post-card__main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 .post-card__title {
     font-size: clamp(1rem, 2vw, 1.4rem);
     font-weight: bold;
-    margin: 0.5rem 0;
-    text-align: center;
+    margin-bottom: 0.3rem;
 }
 .post-card__description {
     font-size: clamp(0.85rem, 1.5vw, 1rem);
-    text-align: center;
     line-height: 1.4;
-    margin-bottom: auto;
+    color: #333;
+}
+
+/* ===== セカンドコンテンツ（アコーディオン展開） ===== */
+.post-card__second {
+    max-height: 0;
+    overflow: hidden;
+    padding: 0;
+    opacity: 0;
+    transition: all 0.4s ease;
+    border-top: 1px dashed transparent;
+}
+.post-card__second.open {
+    max-height: 400px; /* 十分大きい値を指定 */
+    padding: 0.5rem;
+    opacity: 1;
+    border-top: 1px dashed #aaa;
+}
+.post-card__second dt {
+    font-weight: bold;
+    margin-top: 0.3rem;
+}
+.post-card__second dd {
+    margin-left: 0.5rem;
+    margin-bottom: 0.3rem;
 }
 
 /* ===== フッター ===== */
 .post-card__footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between; /* 左: 編集削除 / 中央: もっと見る / 右: お気に入り */
     align-items: center;
     gap: 10px;
-    margin-top: 0.5rem;
+}
+
+/* 左側（編集削除） */
+.post-card__footer-left {
+    display: flex;
+    gap: 8px;
+}
+.edit-button, .delete-button {
+    background: #f97316;
+    color: #fff;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
+    cursor: pointer;
+    border: none;
+}
+.edit-button:hover,
+.delete-button:hover {
+    background: #ea580c;
+}
+
+/* 中央（もっと見る） */
+.post-card__footer-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+.more-button {
+    background: #cdcdcd74;
+    color: #000000;
+    padding: 0.4rem 0.8rem;
+    border-radius: 50px;
+    font-size: clamp(0.8rem, 1.2vw, 0.9rem);
+    cursor: pointer;
+    border: none;
+    transition: background 0.2s;
+}
+.more-button:hover {
+    background: #b0b3bab4;
+}
+
+/* 右側（お気に入り） */
+.post-card__footer-right {
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 .favorite-button {
     font-size: clamp(1rem, 2vw, 1.3rem);
@@ -90,15 +164,4 @@
 }
 .favorite-button.active {
     color: orange;
-}
-.detail-button {
-    background: #f97316;
-    color: #fff;
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
-    cursor: pointer;
-}
-.detail-button:hover {
-    background: #ea580c;
 }

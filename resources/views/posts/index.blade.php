@@ -1,66 +1,90 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">投稿一覧</h1>
-    {{-- 投稿リスト --}}
+    {{-- ページタイトル --}}
+    <h1 class="page-title">投稿一覧</h1>
 
-{{-- 検索フォーム --}}
-<form action="{{ route('posts.index') }}" method="GET" style="margin-bottom: 20px;">
+    {{-- 検索フォーム --}}
+    <form action="{{ route('posts.index') }}" method="GET" class="search-bar">
+        <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="タイトルや説明で検索">
 
-    <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="タイトルや説明で検索">
-        <select name="sort">
-        <option value="">新しい順</option>
-        <option value="old" {{ $sort === 'old' ? 'selected' : '' }}>古い順</option>
-        <option value="favorites" {{ $sort === 'favorites' ? 'selected' : '' }}>人気順</option>
-    </select>
+    {{-- カスタムドロップダウン --}}
+    <div class="custom-dropdown">
+        <input type="hidden" name="sort" id="sortInput" value="{{ $sort ?? '' }}">
+        <button type="button" class="dropdown-toggle" onclick="toggleDropdown()">
+            {{ $sort === 'old' ? '古い順' : ($sort === 'favorites' ? '人気順' : '新しい順') }}
+            <span class="arrow">▼</span>
+        </button>
+        <ul class="dropdown-menu" id="dropdownMenu">
+            <li onclick="selectOption('')">新しい順</li>
+            <li onclick="selectOption('old')">古い順</li>
+            <li onclick="selectOption('favorites')">人気順</li>
+        </ul>
+    </div>
 
-    <button type="submit">検索</button>
-</form>
 
-@foreach($posts as $post)
+        <button type="submit" class="search-button">検索</button>
+    </form>
 
-    @if ($post->isFavoritedBy(auth()->user()))
-        {{-- お気に入り解除 --}}
-        <form action="{{ route('favorites.destroy', $post->id) }}" method="POST" style="display:inline;">
-            @csrf
-            @method('DELETE')
-            <button type="submit" style="color: gold;">★</button>
-        </form>
-    @else
-        {{-- お気に入り登録 --}}
-        <form action="{{ route('favorites.store', $post->id) }}" method="POST" style="display:inline;">
-            @csrf
-            <button type="submit" style="color: gray;">☆</button>
-        </form>
-    @endif
-    <p>お気に入り数: {{ $post->favorites_count }}</p>
-    
-    <p>
-        <img src="{{ $post->user->icon_url }}" 
-            alt="ユーザーアイコン" 
-            style="width:50px; height:50px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle;">
-        {{ $post->user->name }}
-    </p>
+    {{-- 区切り線 --}}
+    <hr class="divider">
 
-    @if ($post->screenshot_path)
-        <div style="width:450px; height:250px; border-radius:15px; background:#ffffff; display:flex; align-items:center; justify-content:center; overflow:hidden; border:3px solid #000;">
-            <img src="{{ asset('storage/' . $post->screenshot_path) }}"
-                alt="スクショ"
-                style="max-width:100%; max-height:100%; object-fit:contain;">
-        </div>
-    @else
-        <div style="width:450px; height:250px; border-radius:15px; background:#ffffff; display:flex; align-items:center; justify-content:center; color:#555; border:3px solid #000;">
-            [画像なし]
-        </div>
-    @endif
+    {{-- 投稿一覧（Gridで整列） --}}
+    <div class="post-list">
+        @foreach($posts as $post)
+            <div class="post-card">
+                <div class="post-card__header">
+                    <img src="{{ $post->user->icon_url }}" alt="ユーザーアイコン" class="post-card__icon">
+                    <span class="post-card__username">{{ $post->user->name }}</span>
+                </div>
 
-    <h3>{{ $post->title }}</h3>
-    <p>{{ $post->body }}</p>
-    <a href="{{ route('posts.show', $post->id) }}">詳細を見る</a>
-@endforeach
+                <div class="post-card__image">
+                    @if ($post->screenshot_path)
+                        <img src="{{ asset('storage/' . $post->screenshot_path) }}" alt="スクショ">
+                    @else
+                        <span>[画像なし]</span>
+                    @endif
+                </div>
 
-<div style="margin-top: 20px;">
-    {{ $posts->appends(['search' => $search ?? '', 'sort' => $sort ?? ''])->links() }}{{-- 条件を保持したままページング --}}
-</div>
+                <h3 class="post-card__title">{{ $post->title }}</h3>
+                <p class="post-card__description">{{ $post->body }}</p>
+
+                <div class="post-card__footer">
+                    @if ($post->isFavoritedBy(auth()->user()))
+                        <form action="{{ route('favorites.destroy', $post->id) }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="favorite-button active">★</button>
+                        </form>
+                    @else
+                        <form action="{{ route('favorites.store', $post->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="favorite-button">☆</button>
+                        </form>
+                    @endif
+                    <span>{{ $post->favorites_count }}</span>
+                    <a href="{{ route('posts.show', $post->id) }}" class="detail-button">詳細</a>
+                </div>
+            </div>
+        @endforeach
+    </div>
+
+    <div class="pagination-area">
+        {{ $posts->appends(['search' => $search ?? '', 'sort' => $sort ?? ''])->links() }}
+    </div>
+    <script>
+    function toggleDropdown() {
+        document.getElementById('dropdownMenu').style.display =
+            document.getElementById('dropdownMenu').style.display === 'block' ? 'none' : 'block';
+    }
+
+    function selectOption(value) {
+        document.getElementById('sortInput').value = value;
+        document.querySelector('.dropdown-toggle').childNodes[0].nodeValue =
+            value === 'old' ? '古い順' :
+            value === 'favorites' ? '人気順' : '新しい順';
+        document.getElementById('dropdownMenu').style.display = 'none';
+    }
+    </script>
 
 @endsection

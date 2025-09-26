@@ -35,7 +35,7 @@ class PostController extends Controller
             $query->orderBy('created_at', 'desc'); // デフォルト：新しい投稿順
         }
 
-        $posts = $query->paginate(1);//ページネーション
+        $posts = $query->paginate(6);//ページネーション
         return view('posts.index', compact('posts', 'search', 'sort'));
     }
 
@@ -322,9 +322,9 @@ class PostController extends Controller
         $user = auth()->user();
 
         if ($tab === 'like') {
-            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(1);// お気に入り投稿
+            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(6);// お気に入り投稿
         } else {
-            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(1);// 自分の投稿
+            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(6);// 自分の投稿
         }
 
         return view('posts.mypage', compact('posts', 'tab'));

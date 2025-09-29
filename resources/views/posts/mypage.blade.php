@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-<h1 class="text-xl font-bold mb-4">アカウント</h1>
+<h1 class="page-title">アカウント</h1>
 
 
 <p>

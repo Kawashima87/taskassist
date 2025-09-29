@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">ps1 ファイル管理</h1>
+    <h1 class="page-title">ps1 ファイル管理</h1>
 
     @if (session('success'))
         <p style="color: green;">{{ session('success') }}</p>

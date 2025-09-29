@@ -8,6 +8,8 @@
         'resources/css/components/search.css',
         'resources/css/components/post-card.css',
         'resources/css/components/sidebar.css',
+        'resources/css/components/createform.css',
+        'resources/css/components/pageTitle.css',
         'resources/js/app.js'
     ])
 </head>

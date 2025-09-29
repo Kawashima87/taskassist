@@ -2,7 +2,7 @@
 
 @section('content')
 
-<h1 class="text-xl font-bold mb-4">ユーザー管理</h1>
+<h1 class="page-title">ユーザー管理</h1>
 
 {{-- 検索フォーム --}}
 <form method="GET" action="{{ route('admin.users') }}" id="searchForm">

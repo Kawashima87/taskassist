@@ -1,0 +1,20 @@
+/* ==============================
+   ページタイトル
+============================== */
+.page-title {
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    margin: 40px 0 20px;
+    color: #111827;
+    position: relative;
+}
+.page-title::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: #f97316;
+    margin: 8px auto 0;
+    border-radius: 2px;
+}

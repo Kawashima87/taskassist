@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-    <h1 class="text-xl font-bold mb-4">ログファイル</h1>
+    <h1 class="page-title">ログファイル</h1>
 
 <h1 class="text-xl font-bold mb-4">エラーログ(最新100行)</h1>
     @if (empty($lines))

@@ -1,7 +1,7 @@
 @extends('layouts.sidebar')
 
 @section('content')
-<h1 class="text-xl font-bold mb-4">投稿詳細</h1>
+<h1 class="page-title">投稿詳細</h1>
 
 <h2>{{ $post->title }}</h2>
 @if ($post->isFavoritedBy(auth()->user()))

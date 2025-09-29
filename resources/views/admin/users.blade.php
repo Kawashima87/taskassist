@@ -15,40 +15,44 @@
 
 
 {{-- ユーザー一覧 --}}
-<table border="1" cellpadding="5" cellspacing="0">
-    <tr>
-        <th>ユーザー名</th>
-        <th>操作</th>
-    </tr>
+<table class="user-table">
+    <thead>
+        <tr>
+            <th>ユーザー名</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
     @foreach($users as $user)
         <tr>
             <td>
-                <p>
-                    <img src="{{$user->icon_url }}" 
-                        alt="ユーザーアイコン" 
-                        style="width:50px; height:50px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle;">
-                    {{ $user->name }}
-                </p>
+                <div class="user-info">
+                    <img src="{{ $user->icon_url }}" alt="ユーザーアイコン">
+                    <span>{{ $user->name }}</span>
+                </div>
             </td>
             <td>
                 {{-- 詳細 --}}
-                <button type="button" onclick="showUserDetail({{$user->id}})">詳細</button>
+                <button type="button" class="detail-btn" onclick="showUserDetail({{ $user->id }})">
+                    詳細
+                </button>
 
                 {{-- 削除（管理者以外） --}}
                 @if (!$user->is_admin)
                     <form action="{{ route('admin.users.delete', $user->id) }}" 
-                          method="POST" 
-                          style="display:inline;" 
-                          onsubmit="return confirm(&quot;本当に削除しますか？&quot;);">
+                          method="POST" style="display:inline;"
+                          onsubmit="return confirm('本当に削除しますか？');">
                         @csrf
                         @method('DELETE')
-                        <button type="submit">削除</button>
+                        <button type="submit" class="delete-btn">削除</button>
                     </form>
                 @endif
             </td>
         </tr>
     @endforeach
+    </tbody>
 </table>
+
 
 <div style="margin-top: 20px;">
     {{ $users->appends(['search' => $search ?? ''])->links() }}

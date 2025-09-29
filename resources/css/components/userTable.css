@@ -1,0 +1,160 @@
+/* ==============================
+   ユーザー管理テーブル
+============================== */
+.user-table {
+    width: 80%;
+    margin: 30px auto 0;   /* ← auto を指定して左右中央に */
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-size: 20px;
+}
+
+/* ヘッダー */
+.user-table th {
+    background: #f97316; /* オレンジ */
+    color: #fff;
+    font-weight: bold;
+    text-align: left;
+    padding: 12px 16px;
+}
+
+/* ボディ */
+.user-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #e5e7eb; /* グレーの仕切り線 */
+    vertical-align: middle;
+}
+
+/* 最後の行はボーダー消す */
+.user-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 行ホバー */
+.user-table tbody tr:hover {
+    background: #fef3c7; /* 薄オレンジ */
+}
+
+/* ユーザーアイコンと名前 */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.user-info img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* ボタン共通 */
+.user-table button {
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+
+/* 詳細ボタン */
+.user-table button.detail-btn {
+    background: #3b82f6; /* 青 */
+    color: #fff;
+}
+.user-table button.detail-btn:hover {
+    background: #2563eb;
+}
+
+/* 削除ボタン */
+.user-table button.delete-btn {
+    background: #ef4444; /* 赤 */
+    color: #fff;
+    margin-left: 6px;
+}
+.user-table button.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* ==============================
+   モーダル
+============================== */
+#userDetailModal {
+    position: fixed;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    padding: 20px;
+    width: 420px;
+    z-index: 1000;
+}
+#userDetailModal button {
+    margin-top: 12px;
+    background: #6b7280; /* グレー */
+    color: #fff;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+#userDetailModal button:hover {
+    background: #4b5563;
+}
+/* ==============================
+   ユーザー詳細モーダル内容
+============================== */
+.user-detail-card {
+    padding: 10px 5px;
+}
+
+.user-detail-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #111827;
+    border-bottom: 2px solid #f97316; /* オレンジ下線 */
+    padding-bottom: 6px;
+}
+
+.user-detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.user-detail-item:last-child {
+    border-bottom: none;
+}
+
+.user-detail-item .label {
+    font-weight: bold;
+    color: #374151;
+}
+
+.user-detail-item .value {
+    color: #111827;
+}
+
+/* ==============================
+   モーダル位置を中央に
+============================== */
+#userDetailModal {
+    position: fixed;
+    top: 50%;               /* 画面中央 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 中央寄せ */
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    padding: 20px;
+    width: 420px;
+    z-index: 1000;
+}

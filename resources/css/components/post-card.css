@@ -207,3 +207,44 @@
 .favorite-button:hover .nav-icon {
     transform: scale(1.5);
 }
+
+/* ==============================
+   投稿詳細（もっと見る）
+============================== */
+.detail-title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #111827;
+    border-bottom: 2px solid #f97316; /* オレンジライン */
+    padding-bottom: 4px;
+}
+
+.detail-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #f9fafb; /* 薄いグレー */
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+
+.detail-item .label {
+    font-weight: bold;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.detail-item .value {
+    color: #111827;
+    font-size: 0.9rem;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word; /* 長いパスも折り返し */
+}

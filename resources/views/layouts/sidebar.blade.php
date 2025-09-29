@@ -11,6 +11,8 @@
         'resources/css/components/createform.css',
         'resources/css/components/pageTitle.css',
         'resources/css/components/mypage.css',
+        'resources/css/components/userTable.css',
+        'resources/css/components/ps1.css',
         'resources/js/app.js'
     ])
 </head>

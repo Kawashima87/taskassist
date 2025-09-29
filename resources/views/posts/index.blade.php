@@ -57,28 +57,44 @@
 
                 {{-- セカンドコンテンツ（詳細情報：もっと見るで開閉） --}}
                 <div class="post-card__second">
-                    <dl>
-                        <dt>操作種別</dt>
-                        <dd>{{ $post->action_type === 'program' ? 'アプリ実行' : 'ポップアップ通知' }}</dd>
+                    <h4 class="detail-title">詳細情報</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="label">操作種別</span>
+                            <span class="value">{{ $post->action_type === 'program' ? 'アプリ実行' : 'ポップアップ通知' }}</span>
+                        </div>
 
                         @if ($post->action_type === 'program')
-                            <dt>実行ファイルのパス</dt>
-                            <dd>{{ $post->program_path ?? '（なし）' }}</dd>
-                            <dt>引数</dt>
-                            <dd>{{ $post->arguments ?? '（なし）' }}</dd>
+                            <div class="detail-item">
+                                <span class="label">実行ファイルのパス</span>
+                                <span class="value">{{ $post->program_path ?? '（なし）' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">引数</span>
+                                <span class="value">{{ $post->arguments ?? '（なし）' }}</span>
+                            </div>
                         @else
-                            <dt>ポップアップタイトル</dt>
-                            <dd>{{ $post->popup_title ?? '（なし）' }}</dd>
-                            <dt>ポップアップメッセージ</dt>
-                            <dd>{{ $post->popup_message ?? '（なし）' }}</dd>
+                            <div class="detail-item">
+                                <span class="label">ポップアップタイトル</span>
+                                <span class="value">{{ $post->popup_title ?? '（なし）' }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">ポップアップメッセージ</span>
+                                <span class="value">{{ $post->popup_message ?? '（なし）' }}</span>
+                            </div>
                         @endif
 
-                        <dt>実行日時</dt>
-                        <dd>{{ $post->run_datetime }}</dd>
-                        <dt>有効状態</dt>
-                        <dd>{{ $post->enabled ? '有効' : '停止中' }}</dd>
-                    </dl>
+                        <div class="detail-item">
+                            <span class="label">実行日時</span>
+                            <span class="value">{{ $post->run_datetime }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">有効状態</span>
+                            <span class="value">{{ $post->enabled ? '有効' : '停止中' }}</span>
+                        </div>
+                    </div>
                 </div>
+
 
                 {{-- フッター --}}
                 <div class="post-card__footer">

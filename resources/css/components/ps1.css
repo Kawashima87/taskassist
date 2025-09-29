@@ -1,0 +1,90 @@
+/* ==============================
+   ps1 管理 共通
+============================== */
+.success-message {
+    color: green;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+.no-file-message {
+    color: #374151;
+    margin: 20px 0;
+}
+
+/* ==============================
+   アクションボタン配置
+============================== */
+.ps1-actions {
+    display: flex;
+    justify-content: flex-end; /* ←右寄せ */
+    gap: 10px;
+    margin: 0 auto 15px;       /* テーブルとバランス */
+    width: 80%;                /* テーブルと同じ幅で中央揃え */
+    box-sizing: border-box;
+}
+
+
+.ps1-actions button {
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+/* すべて選択ボタン */
+.toggle-btn {
+    background: #3b82f6; /* 青 */
+    color: #fff;
+}
+.toggle-btn:hover {
+    background: #2563eb;
+}
+
+/* 削除ボタン */
+.delete-btn {
+    background: #ef4444; /* 赤 */
+    color: #fff;
+}
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* ==============================
+   ps1 ファイルテーブル
+============================== */
+.ps1-table {
+    width: 80%;
+    margin: 0 auto;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    font-size: 14px;
+}
+
+.ps1-table th {
+    background: #f97316; /* オレンジ */
+    color: #fff;
+    text-align: left;
+    padding: 12px;
+}
+
+.ps1-table td {
+    padding: 12px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.ps1-table tr:last-child td {
+    border-bottom: none;
+}
+
+.ps1-table tbody tr:hover {
+    background: #fef3c7; /* 薄オレンジ */
+}
+
+.ps1-table input[type="checkbox"] {
+    transform: scale(1.2);
+}

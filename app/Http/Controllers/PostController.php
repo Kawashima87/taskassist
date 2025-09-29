@@ -318,15 +318,24 @@ class PostController extends Controller
 
     public function mypage(Request $request)
     {
-        $tab = $request->get('tab', 'history'); // デフォルトは history
+        $tab = $request->get('tab', 'history');
         $user = auth()->user();
 
         if ($tab === 'like') {
-            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(6);// お気に入り投稿
+            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(6);
         } else {
-            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(6);// 自分の投稿
+            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(6);
         }
 
-        return view('posts.mypage', compact('posts', 'tab'));
+        // public/storage/icons に置いたファイル名一覧
+        $icons = [
+            'azarashi.svg', 'man.svg', 'hamburger.svg',
+            'mountain.svg', 'tie.svg', 'penguin.svg',
+            'woman.svg', 'baseball.svg', 'fox.svg',
+            'eagle.svg','strawberry.svg','crown.svg',
+        ];
+
+        return view('posts.mypage', compact('posts', 'tab', 'icons'));
     }
+
 }

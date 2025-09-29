@@ -9,8 +9,50 @@
          alt="ユーザーアイコン" 
          class="mypage-user__icon">
     <span class="mypage-user__name">{{ auth()->user()->name }}</span>
+
+    {{-- 編集ボタン --}}
+    <button type="button" class="edit-button" onclick="openEditModal()">
+        @include('icons.edit')
+    </button>
 </div>
 
+{{-- モーダル --}}
+<div id="editModal" class="modal hidden">
+    <div class="modal-content">
+        <h2>プロフィール編集</h2>
+        <form action="{{ route('user.update') }}" method="POST">
+            @csrf
+            @method('PUT')
+
+            {{-- 名前入力 --}}
+            <div>
+                <label for="name">名前</label>
+                <input type="text" name="name" id="name" value="{{ auth()->user()->name }}" required>
+            </div>
+
+            {{-- アイコン選択 --}}
+            <div>
+                <label>アイコン</label>
+                <div class="icon-grid">
+                    @foreach($icons as $icon)
+                        <label class="icon-option">
+                            <input type="radio" name="icon" value="{{ $icon }}"
+                                {{ auth()->user()->icon_path === 'icons/'.$icon ? 'checked' : '' }}>
+                            <img src="{{ asset('storage/icons/'.$icon) }}" 
+                                class="icon-preview" 
+                                alt="icon">
+                        </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button type="submit">更新</button>
+                <button type="button" onclick="closeEditModal()">キャンセル</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {{-- スライド式タブ --}}
 <div class="tab-switcher">
@@ -176,6 +218,12 @@
         const details = card.querySelector('.post-card__second');
         details.classList.toggle('open');
         button.textContent = details.classList.contains('open') ? '閉じる' : 'もっと見る';
+    }
+    function openEditModal() {
+        document.getElementById('editModal').classList.remove('hidden');
+    }
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
     }
 </script>
 @endpush

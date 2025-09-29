@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\UserController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -55,3 +57,5 @@ Route::get('/mypage', [PostController::class, 'mypage'])->name('posts.mypage')->
 
 Route::post('/posts/{post}/favorite', [FavoriteController::class, 'store'])->name('favorites.store')->middleware('auth');//お気に入り登録
 Route::delete('/posts/{post}/favorite', [FavoriteController::class, 'destroy'])->name('favorites.destroy')->middleware('auth');//お気に入り解除
+
+Route::put('/user/update', [UserController::class, 'update'])->name('user.update');

@@ -162,6 +162,7 @@
     <div class="pagination-area">
         {{ $posts->appends(['search' => $search ?? '', 'sort' => $sort ?? ''])->links() }}
     </div>
+
 @endsection
 
 @push('scripts')

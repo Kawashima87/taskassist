@@ -69,3 +69,129 @@
 .tab-indicator.like {
     transform: translateX(100%);
 }
+/* ===== モーダル全体 ===== */
+.modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px); /* 背景をぼかす */
+    z-index: 9999;
+    transition: opacity 0.3s ease;
+}
+.modal.hidden { display: none; }
+
+/* ===== モーダルボックス ===== */
+.modal-content {
+    background: #fff;
+    padding: 25px 30px;
+    border-radius: 20px;
+    width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    animation: popIn 0.3s ease; /* ふわっと登場 */
+}
+
+@keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+}
+
+/* ===== タイトル ===== */
+.modal-content h2 {
+    font-size: 1.4rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #f97316; /* オレンジでアクセント */
+}
+
+/* ===== フォーム要素 ===== */
+.modal-content label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.2s;
+}
+.modal-content input[type="text"]:focus {
+    border-color: #f97316;
+}
+
+/* ===== アイコングリッド ===== */
+.icon-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+    justify-items: center; /* ★ 各セル内で中央寄せ */
+}
+.icon-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.icon-option:hover {
+    transform: scale(1.05);
+}
+.icon-preview {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    transition: border-color 0.3s, transform 0.2s;
+}
+.icon-option input:checked + .icon-preview {
+    border-color: #f97316;
+    transform: scale(1.1);
+}
+
+/* ===== ボタン ===== */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 10px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modal-actions button[type="submit"] {
+    background: #f97316;
+    color: #fff;
+}
+.modal-actions button[type="submit"]:hover {
+    background: #fb923c;
+}
+
+.modal-actions button[type="button"] {
+    background: #f3f4f6;
+    color: #444;
+}
+.modal-actions button[type="button"]:hover {
+    background: #e5e7eb;
+}
+

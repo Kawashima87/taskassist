@@ -14,6 +14,7 @@
         'resources/css/components/userTable.css',
         'resources/css/components/ps1.css',
         'resources/css/components/logs.css',
+        'resources/css/components/pagination.css',
         'resources/js/app.js'
     ])
 </head>
@@ -65,6 +66,15 @@
                 </div>
             </div>
         @endif
+
+        {{-- ▼ ログアウトリンク --}}
+        <form method="POST" action="{{ route('logout') }}" class="logout-form mt-auto">
+            @csrf
+            <button type="submit">
+                @include('icons.logout') {{-- アイコンは icons/logout.blade.php を用意してください --}}
+                <span>ログアウト</span>
+            </button>
+        </form>
     </nav>
 </aside>
 

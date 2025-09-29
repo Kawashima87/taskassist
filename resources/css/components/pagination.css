@@ -1,0 +1,71 @@
+/* ==============================
+   ページネーション（Tailwind既定を上書き）
+============================== */
+
+/* コンテナ（中央寄せはそのまま） */
+.pagination-area {
+    display: flex;
+    justify-content: center;
+    margin: 30px 0;
+}
+
+/* 生成される nav 配下の a / span を丸ボタン化 */
+.pagination-area nav a,
+.pagination-area nav span {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    min-width: 40px !important;
+    padding: 8px 12px !important;
+    margin: 0 4px !important;
+
+    border-radius: 9999px !important;   /* まるいボタン */
+    background: #f9fafb !important;     /* 薄グレー */
+    border: 1px solid #e5e7eb !important;
+    color: #374151 !important;          /* 濃グレー文字 */
+
+    text-decoration: none !important;
+    line-height: 1 !important;
+    font-weight: 700 !important;
+
+    transition: transform .2s ease, box-shadow .2s ease,
+                background .2s ease, color .2s ease, border-color .2s ease !important;
+}
+
+/* ホバー */
+.pagination-area nav a:hover {
+    background: #f97316 !important;     /* オレンジ */
+    color: #fff !important;
+    border-color: #f97316 !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 3px 6px rgba(0,0,0,.15) !important;
+}
+
+/* 現在ページ */
+.pagination-area nav span[aria-current="page"] {
+    background: linear-gradient(135deg, #f97316, #ec4899) !important; /* オレンジ→ピンク */
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3) !important;
+    cursor: default !important;
+}
+
+/* 矢印SVGの色を文字色に合わせる */
+.pagination-area nav svg {
+    width: 16px; height: 16px;
+    fill: currentColor;
+}
+/* 無効な矢印ボタン（前へ/次へ） */
+.pagination-area nav span[aria-disabled="true"] {
+    background: #f3f4f6 !important;   /* 薄いグレー */
+    color: #9ca3af !important;        /* 薄い文字 */
+    border: 1px solid #e5e7eb !important;
+
+    /* サイズは統一しつつ、アクティブページほど目立たせない */
+    transform: none !important;
+    box-shadow: none !important;
+    font-weight: normal !important;
+    opacity: 0.7;                     /* 少し透ける感じ */
+    transform: scale(1.5);
+}

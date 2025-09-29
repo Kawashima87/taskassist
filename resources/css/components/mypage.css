@@ -58,7 +58,7 @@
     top: 0;
     bottom: 0;
     width: 50%;
-    background: #f97316;
+    background: linear-gradient(135deg, #f97316, #ec4899); /* オレンジ→ピンクのグラデーション */;
     border-radius: 25px;
     transition: transform 0.3s ease;
     z-index: 1;
@@ -180,11 +180,11 @@
 }
 
 .modal-actions button[type="submit"] {
-    background: #f97316;
+    background: linear-gradient(135deg, #f97316, #ec4899); /* オレンジ→ピンクのグラデーション */
     color: #fff;
 }
 .modal-actions button[type="submit"]:hover {
-    background: #fb923c;
+    background: linear-gradient(135deg, #f97316, #ec4899); /* オレンジ→ピンクのグラデーション */
 }
 
 .modal-actions button[type="button"] {

@@ -54,7 +54,8 @@
 </table>
 
 
-<div style="margin-top: 20px;">
+    {{-- ページネーション --}}
+    <div class="pagination-area">
     {{ $users->appends(['search' => $search ?? ''])->links() }}
 </div>
 

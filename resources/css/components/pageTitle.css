@@ -14,7 +14,7 @@
     display: block;
     width: 60px;
     height: 4px;
-    background: #f97316;
+    background: linear-gradient(135deg, #f97316, #ec4899); /* オレンジ→ピンクのグラデーション */
     margin: 8px auto 0;
     border-radius: 2px;
 }

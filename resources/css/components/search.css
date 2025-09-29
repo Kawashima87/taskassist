@@ -35,7 +35,7 @@
    検索ボタン
 ============================== */
 .search-bar button {
-    background: #f97316;
+    background: linear-gradient(135deg, #f97316, #ec4899); /* オレンジ→ピンクのグラデーション */
     color: #fff;
     padding: 10px 12px;
     border: none;

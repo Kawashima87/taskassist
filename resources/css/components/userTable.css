@@ -63,7 +63,7 @@
 
 /* 詳細ボタン */
 .user-table button.detail-btn {
-    background: #3b82f6; /* 青 */
+    background: linear-gradient(135deg, #07e1e9, #5348ec); /* オレンジ→ピンクのグラデーション */
     color: #fff;
 }
 .user-table button.detail-btn:hover {
@@ -72,7 +72,7 @@
 
 /* 削除ボタン */
 .user-table button.delete-btn {
-    background: #ef4444; /* 赤 */
+    background: linear-gradient(135deg, #f91616, #ec4899); /* オレンジ→ピンクのグラデーション */
     color: #fff;
     margin-left: 6px;
 }

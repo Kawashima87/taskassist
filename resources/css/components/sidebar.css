@@ -60,13 +60,13 @@
 
 .sidebar nav a:hover,
 .admin-section a:hover {
-    background-color: #fef3c7;  /* 薄いオレンジ */
+    background: linear-gradient(135deg, hsla(25, 100%, 63%, 0.31), #ff6eb741); /* オレンジ→ピンクのグラデーション */  /* 薄いオレンジ */
     color: #111827;
 }
 
 .sidebar nav a.active,
 .admin-section a.active {
-    background-color: #f97316;  /* オレンジで強調 */
+    background: linear-gradient(135deg, #f97316, #ec4899); /* オレンジ→ピンクのグラデーション */  /* オレンジで強調 */
     color: #fff;
     font-weight: bold;
     transform: scale(1.1);
@@ -139,7 +139,7 @@
 }
 
 .logout-form button:hover {
-    background-color: #fef3c7;
+    background: linear-gradient(135deg, #f9741636, #ec489a2a); /* オレンジ→ピンクのグラデーション */;
     color: #111827;
 }
 

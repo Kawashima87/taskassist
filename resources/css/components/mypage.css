@@ -1,0 +1,71 @@
+/* ==============================
+   マイページのユーザー情報
+============================== */
+.mypage-user {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* ← アイコンと名前の間隔 */
+    margin-bottom: 20px;
+    margin-left: 80px; /* ← 全体を20pxだけ中央寄りに */
+}
+
+.mypage-user__icon {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0; /* アイコンのサイズ固定 */
+}
+
+.mypage-user__name {
+    font-size: clamp(1.6rem, 3vw, 2rem); /* 大きめ */
+    font-weight: bold;
+    color: #111;
+}
+
+
+
+/* ===== タブ切替（スライド式） ===== */
+.tab-switcher {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    width: 900px;
+    margin: 35px auto;
+    background: #ddd;
+    border-radius: 25px;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    z-index: 2;
+    cursor: pointer;
+    color: #333;
+    font-weight: bold;
+    transition: color 0.3s;
+    text-decoration: none;
+}
+.tab-btn.active {
+    color: white;
+}
+
+.tab-indicator {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 50%;
+    background: orange;
+    border-radius: 25px;
+    transition: transform 0.3s ease;
+    z-index: 1;
+}
+.tab-indicator.history {
+    transform: translateX(0%);
+}
+.tab-indicator.like {
+    transform: translateX(100%);
+}

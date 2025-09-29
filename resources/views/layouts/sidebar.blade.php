@@ -10,6 +10,7 @@
         'resources/css/components/sidebar.css',
         'resources/css/components/createform.css',
         'resources/css/components/pageTitle.css',
+        'resources/css/components/mypage.css',
         'resources/js/app.js'
     ])
 </head>

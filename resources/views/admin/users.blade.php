@@ -5,21 +5,14 @@
 <h1 class="page-title">ユーザー管理</h1>
 
 {{-- 検索フォーム --}}
-<form method="GET" action="{{ route('admin.users') }}" id="searchForm">
+<form method="GET" action="{{ route('admin.users') }}" class="search-bar">
     <input type="text" name="search" value="{{ $search ?? '' }}" placeholder="ユーザー名で検索">
-    <button type="submit">検索</button>
-    <button type="button" id="resetButton">リセット</button>
+
+    <button type="submit" class="search-button">
+        @include('icons.search')
+    </button>
 </form>
 
-{{-- 検索リセット --}}
-<script>
-    document.getElementById('resetButton').addEventListener('click', function() {
-        // 入力フィールドを空にする
-        document.querySelector('input[name="search"]').value = '';
-        // フォームを送信する
-        document.getElementById('searchForm').submit();
-    });
-</script>
 
 {{-- ユーザー一覧 --}}
 <table border="1" cellpadding="5" cellspacing="0">

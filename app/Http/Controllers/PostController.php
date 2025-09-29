@@ -276,7 +276,7 @@ class PostController extends Controller
         ]);
     }
 
-    return redirect()->route('posts.show', $post->id)->with('success', 'タスクを更新しました');
+    return redirect()->route('posts.index', $post->id)->with('success', 'タスクを更新しました');
     }
 
     /**

@@ -35,7 +35,7 @@ class PostController extends Controller
             $query->orderBy('created_at', 'desc'); // デフォルト：新しい投稿順
         }
 
-        $posts = $query->paginate(6);//ページネーション
+        $posts = $query->paginate(10);//ページネーション
         return view('posts.index', compact('posts', 'search', 'sort'));
     }
 
@@ -322,9 +322,9 @@ class PostController extends Controller
         $user = auth()->user();
 
         if ($tab === 'like') {
-            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(6);
+            $posts = $user->favoritePosts()->with('user')->orderBy('created_at', 'desc')->paginate(10);
         } else {
-            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(6);
+            $posts = $user->posts()->with('favorites')->orderBy('created_at', 'desc')->paginate(10);
         }
 
         // public/storage/icons に置いたファイル名一覧

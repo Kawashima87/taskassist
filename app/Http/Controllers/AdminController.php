@@ -17,7 +17,7 @@ class AdminController extends Controller
         if ($search) {
             $query->where('name', 'like', "%$search%");
         }
-        $users = $query->orderBy('id')->paginate(5);
+        $users = $query->orderBy('id')->paginate(10);
         return view('admin.users', compact('users', 'search'));
     }
 

@@ -1,4 +1,6 @@
-/* ===== 投稿一覧 ===== */
+/* ==============================
+   投稿一覧
+============================== */
 .post-list {
     display: flex;
     flex-direction: column;
@@ -7,7 +9,9 @@
     margin-bottom: 20px;
 }
 
-/* ===== 投稿カード（Grid） ===== */
+/* ==============================
+   投稿カード
+============================== */
 .post-card {
     width: 90%;
     border: 2px solid #333;
@@ -16,13 +20,11 @@
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
     padding: 1rem;
     box-sizing: border-box;
-
     display: grid;
-    grid-template-rows: auto auto auto auto;
     gap: 0.5rem;
 }
 
-/* ===== ヘッダー ===== */
+/* ヘッダー */
 .post-card__header {
     display: flex;
     align-items: center;
@@ -39,12 +41,12 @@
     font-size: clamp(0.9rem, 1.2vw, 1rem);
 }
 
-/* ===== ファーストコンテンツ（左右分割） ===== */
+/* ファーストコンテンツ */
 .post-card__first {
     display: grid;
-    grid-template-columns: 1fr 1.2fr; /* 左：画像 / 右：タイトル説明 */
+    grid-template-columns: 1fr 1.2fr;
     gap: 1rem;
-    align-items: start;
+    align-items: stretch; /* ←画像と本文の高さを揃える */
 }
 .post-card__image {
     width: 100%;
@@ -65,123 +67,195 @@
 .post-card__main {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-}
-.post-card__title {
-    font-size: clamp(1rem, 2vw, 1.4rem);
-    font-weight: bold;
-    margin-bottom: 0.3rem;
-}
-.post-card__description {
-    font-size: clamp(0.85rem, 1.5vw, 1rem);
-    line-height: 1.4;
-    color: #333;
+    height: 100%;
 }
 
-/* ===== セカンドコンテンツ（アコーディオン展開） ===== */
+/* ==============================
+   タイトル・説明
+============================== */
+
+/* タイトル枠 */
+.title-box {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    border-radius: 50px;      /* 検索バー風 */
+    padding: 10px 20px;
+    margin-bottom: 14px;      /* 説明との間隔を広めに */
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.post-card__title {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: 0;
+    line-height: 1.4;
+    word-break: break-word;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;     /* 最大2行 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: calc(1.4em * 2); /* 2行分の高さ */
+    width: 100%;
+}
+
+
+/* 説明枠 */
+.description-box {
+    border: 1px solid #d1d5db;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 8px 12px;
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.description-label {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #374151;
+    border-bottom: 2px solid #f97316;
+    padding-bottom: 2px;
+}
+
+
+/* 説明文：デフォルトは省略 (…)、hover でスクロール */
+.post-card__description {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0;
+    line-height: 1.4;
+
+    /* デフォルトは省略表示 */
+    display: -webkit-box;
+    -webkit-line-clamp: 8;     /* 例:6行まで表示 */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+
+    width: 100%;
+    max-height: 100%;
+}
+
+.description-box:hover .post-card__description {
+    overflow-y: auto;          /* ←スクロール可能に */
+    text-overflow: clip;
+    max-height: 100%;          /* 高さは固定 */
+}
+
+/* ==============================
+   詳細情報（開閉式）
+============================== */
 .post-card__second {
     max-height: 0;
     overflow: hidden;
-    padding: 0;
     opacity: 0;
-    transition: all 0.4s ease;
     border-top: 1px dashed transparent;
+    transition: all 0.4s ease;
 }
 .post-card__second.open {
-    max-height: 400px; /* 十分大きい値を指定 */
+    max-height: 400px;
     padding: 0.5rem;
     opacity: 1;
     border-top: 1px dashed #aaa;
 }
-.post-card__second dt {
+.detail-title {
+    font-size: 1rem;
     font-weight: bold;
-    margin-top: 0.3rem;
+    margin-bottom: 10px;
+    color: #111827;
+    border-bottom: 2px solid #f97316;
+    padding-bottom: 4px;
 }
-.post-card__second dd {
-    margin-left: 0.5rem;
-    margin-bottom: 0.3rem;
+.detail-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 10px;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+}
+.detail-item .label {
+    font-weight: bold;
+    color: #374151;
+    font-size: 0.9rem;
+}
+.detail-item .value {
+    color: #111827;
+    font-size: 0.9rem;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-word;
 }
 
-/* ===== フッター ===== */
+/* ==============================
+   フッター
+============================== */
 .post-card__footer {
     display: flex;
-    justify-content: space-between; /* 左: 編集削除 / 中央: もっと見る / 右: お気に入り */
+    justify-content: space-between;
     align-items: center;
     gap: 10px;
 }
-
-/* 左側（編集削除） */
-.post-card__footer-left {
-    display: flex;
-    gap: 8px;
-}
-.edit-button, .delete-button {
-    background: #f97316;
-    color: #fff;
-    padding: 0.4rem 0.8rem;
-    border-radius: 6px;
-    font-size: clamp(0.85rem, 1.2vw, 0.95rem);
-    cursor: pointer;
-    border: none;
-}
-.edit-button:hover,
-.delete-button:hover {
-    background: #ea580c;
-}
-
-/* 中央（もっと見る） */
-.post-card__footer-center {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-.more-button {
-    background: #cdcdcd74;
-    color: #000000;
-    padding: 0.4rem 0.8rem;
-    border-radius: 50px;
-    font-size: clamp(0.8rem, 1.2vw, 0.9rem);
-    cursor: pointer;
-    border: none;
-    transition: background 0.2s;
-}
-.more-button:hover {
-    background: #b0b3bab4;
-}
-
-/* 右側（お気に入り） */
+.post-card__footer-left,
 .post-card__footer-right {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 8px;
 }
-.favorite-button {
-    font-size: clamp(1rem, 2vw, 1.3rem);
-    color: gray;
-    background: none;
+
+/* ==============================
+   ボタン
+============================== */
+.edit-button,
+.delete-button,
+.more-button {
+    padding: 0.4rem 0.8rem;
     border: none;
     cursor: pointer;
+    transition: background 0.2s;
 }
-.favorite-button.active {
-    color: orange;
+.edit-button,
+.delete-button {
+    background: #f97316;
+    color: #fff;
+    border-radius: 6px;
 }
+.edit-button:hover,
+.delete-button:hover { background: #ea580c; }
+.more-button {
+    background: #cdcdcd74;
+    color: #000;
+    border-radius: 50px;
+}
+.more-button:hover { background: #b0b3bab4; }
+
 /* ==============================
-   編集/削除ボタンのアイコン
+   アイコン
 ============================== */
-.edit-button .nav-icon,
-.delete-button .nav-icon {
+.nav-icon {
     width: 1.2rem;
     height: 1.2rem;
     display: block;
     transition: transform 0.2s ease;
 }
 .edit-button:hover .nav-icon,
-.delete-button:hover .nav-icon {
+.delete-button:hover .nav-icon,
+.favorite-button:hover .nav-icon {
     transform: scale(1.5);
 }
-/* ==============================
-   お気に入り（ハート）
-============================== */
 .favorite-button {
     background: none;
     border: none;
@@ -191,60 +265,12 @@
     align-items: center;
     justify-content: center;
 }
-
 .favorite-button .nav-icon {
     width: 2rem;
     height: 2rem;
-    transition: transform 0.2s ease;
+    color: gray;
 }
-
-/* 登録済みハートを赤で強調 */
 .favorite-button.active .nav-icon {
-    color: #ef4444; /* 赤系 (Tailwind red-500) */
+    color: #ef4444;
     fill: currentColor;
-}
-
-.favorite-button:hover .nav-icon {
-    transform: scale(1.5);
-}
-
-/* ==============================
-   投稿詳細（もっと見る）
-============================== */
-.detail-title {
-    font-size: 1rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #111827;
-    border-bottom: 2px solid #f97316; /* オレンジライン */
-    padding-bottom: 4px;
-}
-
-.detail-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 6px 10px;
-    background: #f9fafb; /* 薄いグレー */
-    border: 1px solid #e5e7eb;
-    border-radius: 6px;
-}
-
-.detail-item .label {
-    font-weight: bold;
-    color: #374151;
-    font-size: 0.9rem;
-}
-
-.detail-item .value {
-    color: #111827;
-    font-size: 0.9rem;
-    text-align: right;
-    max-width: 60%;
-    word-break: break-word; /* 長いパスも折り返し */
 }

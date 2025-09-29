@@ -13,6 +13,7 @@
         'resources/css/components/mypage.css',
         'resources/css/components/userTable.css',
         'resources/css/components/ps1.css',
+        'resources/css/components/logs.css',
         'resources/js/app.js'
     ])
 </head>

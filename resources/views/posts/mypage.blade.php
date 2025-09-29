@@ -45,10 +45,18 @@
                         <span>[画像なし]</span>
                     @endif
                 </div>
-                <div class="post-card__main">
-                    <h3 class="post-card__title">{{ $post->title }}</h3>
-                    <p class="post-card__description">{{ $post->body }}</p>
-                </div>
+                    <div class="post-card__main">
+                        {{-- タイトル（検索バー風） --}}
+                        <div class="title-box">
+                            <h3 class="post-card__title">{{ $post->title }}</h3>
+                        </div>
+
+                        {{-- 説明 --}}
+                        <div class="description-box">
+                            <div class="description-label">説明</div>
+                            <p class="post-card__description">{{ $post->body }}</p>
+                        </div>
+                    </div>
             </div>
 
 

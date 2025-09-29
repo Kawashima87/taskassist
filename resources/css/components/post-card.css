@@ -165,3 +165,45 @@
 .favorite-button.active {
     color: orange;
 }
+/* ==============================
+   編集/削除ボタンのアイコン
+============================== */
+.edit-button .nav-icon,
+.delete-button .nav-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    display: block;
+    transition: transform 0.2s ease;
+}
+.edit-button:hover .nav-icon,
+.delete-button:hover .nav-icon {
+    transform: scale(1.5);
+}
+/* ==============================
+   お気に入り（ハート）
+============================== */
+.favorite-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.favorite-button .nav-icon {
+    width: 2rem;
+    height: 2rem;
+    transition: transform 0.2s ease;
+}
+
+/* 登録済みハートを赤で強調 */
+.favorite-button.active .nav-icon {
+    color: #ef4444; /* 赤系 (Tailwind red-500) */
+    fill: currentColor;
+}
+
+.favorite-button:hover .nav-icon {
+    transform: scale(1.5);
+}

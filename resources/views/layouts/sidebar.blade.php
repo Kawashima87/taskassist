@@ -10,7 +10,6 @@
         'resources/css/components/sidebar.css',
         'resources/js/app.js'
     ])
-
 </head>
 @stack('scripts')
 <body class="flex min-h-screen bg-gray-100">
@@ -20,53 +19,54 @@
     <div class="sidebar-header">
         TaskAssist
     </div>
-        <nav>
-            @php
-                $links = [
-                    ['route' => 'posts.index',  'label' => 'ホーム'],
-                    ['route' => 'posts.create', 'label' => '新規作成'],
-                    ['route' => 'posts.mypage', 'label' => 'アカウント'],
-                ];
+    <nav>
+        @php
+            // ★ アイコン名を追加（icons/*.blade.php のファイル名と対応）
+            $links = [
+                ['route' => 'posts.index',  'label' => 'ホーム',   'icon' => 'home'],
+                ['route' => 'posts.create', 'label' => '新規作成', 'icon' => 'add'],
+                ['route' => 'posts.mypage', 'label' => 'アカウント','icon' => 'accountCircle'],
+            ];
 
-                $adminLinks = [
-                    ['route' => 'admin.users', 'label' => 'ユーザー情報'],
-                    ['route' => 'admin.logs',  'label' => 'エラーログ'],
-                    ['route' => 'admin.ps1',   'label' => 'ps1管理'],
-                ];
-            @endphp
+            $adminLinks = [
+                ['route' => 'admin.users', 'label' => 'ユーザー情報', 'icon' => 'manageAccounts'],
+                ['route' => 'admin.logs',  'label' => 'エラーログ',   'icon' => 'manageHistory'],
+                ['route' => 'admin.ps1',   'label' => 'ps1管理',      'icon' => 'file'],
+            ];
+        @endphp
 
-            {{-- 通常リンク --}}
-            @foreach ($links as $link)
-                <a href="{{ route($link['route']) }}"
-                class="{{ request()->routeIs($link['route']) ? 'active' : '' }}">
-                {{ $link['label'] }}
-                </a>
-            @endforeach
+        {{-- 通常リンク --}}
+        @foreach ($links as $link)
+            <a href="{{ route($link['route']) }}"
+               class="{{ request()->routeIs($link['route']) ? 'active' : '' }}">
+               @include('icons.' . $link['icon'])
+               <span>{{ $link['label'] }}</span>
+            </a>
+        @endforeach
 
-            {{-- 管理者用リンク --}}
-            @if(auth()->check() && auth()->user()->is_admin)
-                <div class="admin-section">
-                    <p class="admin-title">管理者モード</p>
-                    <div class="admin-links">
-                        @foreach ($adminLinks as $link)
-                            <a href="{{ route($link['route']) }}"
-                            class="{{ request()->routeIs($link['route']) ? 'active' : '' }}">
-                            {{ $link['label'] }}
-                            </a>
-                        @endforeach
-                    </div>
+        {{-- 管理者用リンク --}}
+        @if(auth()->check() && auth()->user()->is_admin)
+            <div class="admin-section">
+                <p class="admin-title">管理者モード</p>
+                <div class="admin-links">
+                    @foreach ($adminLinks as $link)
+                        <a href="{{ route($link['route']) }}"
+                           class="{{ request()->routeIs($link['route']) ? 'active' : '' }}">
+                           @include('icons.' . $link['icon'])
+                           <span>{{ $link['label'] }}</span>
+                        </a>
+                    @endforeach
                 </div>
-            @endif
-        </nav>
-
+            </div>
+        @endif
+    </nav>
 </aside>
-
 
 <main class="ml-64 flex-1 p-6 overflow-y-auto main-content">
     @yield('content')
 </main>
 
-{{-- ★ フラッシュメッセージ（上中央にオーバーレイ表示） --}}
+{{-- ★ フラッシュメッセージ --}}
 @if (session('success'))
     <div id="flash-message-success"
          class="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 
@@ -90,25 +90,20 @@
     </div>
 @endif
 
-{{-- ★ 自動で5秒後に消すスクリプト --}}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const successBox = document.getElementById("flash-message-success");
         const errorBox = document.getElementById("flash-message-error");
-
         [successBox, errorBox].forEach(box => {
             if (box) {
                 setTimeout(() => {
-                    box.style.opacity = "0";      // フェードアウト
-                    setTimeout(() => box.remove(), 500); // 完全に消す
-                }, 5000); // 5秒後
+                    box.style.opacity = "0";
+                    setTimeout(() => box.remove(), 500);
+                }, 5000);
             }
         });
     });
 </script>
-
-
-
 
 </body>
 </html>

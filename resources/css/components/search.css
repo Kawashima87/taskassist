@@ -126,3 +126,11 @@
     margin: 8px auto 0;
     border-radius: 2px;
 }
+/* ==============================
+   検索ボタン内アイコン
+============================== */
+.search-button .nav-icon {
+    width: 1.2rem;
+    height: 1.2rem;
+    display: block;
+}

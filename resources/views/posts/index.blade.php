@@ -22,7 +22,9 @@
             </ul>
         </div>
 
-        <button type="submit" class="search-button">検索</button>
+        <button type="submit" class="search-button">
+            @include('icons.search')
+        </button>
     </form>
 
     <hr class="divider">
@@ -87,12 +89,16 @@
                             <form action="{{ route('favorites.destroy', $post->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="favorite-button active">★</button>
+                                <button type="submit" class="favorite-button active">
+                                    @include('icons.heart-solid')
+                                </button>
                             </form>
                         @else
                             <form action="{{ route('favorites.store', $post->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" class="favorite-button">☆</button>
+                                <button type="submit" class="favorite-button">
+                                    @include('icons.heart-outline')
+                                </button>
                             </form>
                         @endif
                         <span>{{ $post->favorites_count }}</span>
@@ -108,12 +114,16 @@
                     <div class="post-card__footer-right">
                         @auth
                             @if ($post->user_id === auth()->id())
-                                <a href="{{ route('posts.edit', $post->id) }}" class="edit-button">編集</a>
+                                <a href="{{ route('posts.edit', $post->id) }}" class="edit-button">
+                                    @include('icons.edit')
+                                </a>
                                 <form action="{{ route('posts.destroy', $post->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="delete-button"
-                                            onclick="return confirm('本当に削除しますか？')">削除</button>
+                                            onclick="return confirm('本当に削除しますか？')">
+                                        @include('icons.trash')
+                                    </button>
                                 </form>
                             @endif
                         @endauth
